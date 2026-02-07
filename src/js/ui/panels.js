@@ -2,19 +2,26 @@
    MindGraph — Panel Management (right panel, node detail, path)
    ============================================ */
 
+import { state } from '../core/state.js';
+import { nodes, edges, neighbors } from '../core/graph-data.js';
+import { CLUSTER_NAMES } from '../core/config.js';
+import { buildTab0, buildTab1, buildTab2, buildTab3, buildTab4, buildTab5, buildTab6, buildTab7 } from '../analytics/tabs.js';
+import { selectNode } from './interaction.js';
+import { mmDiv } from './minimap.js';
+
 const nodeDetail = document.getElementById('nodeDetail');
-const panelContent = document.getElementById('panelContent');
+export const panelContent = document.getElementById('panelContent');
 
 // Close node detail
 document.getElementById('ndClose').onclick = () => {
-  selectedNode = null; depthMap = null; labelVisCache = null;
+  state.selectedNode = null; state.depthMap = null; state.labelVisCache = null;
   updateND();
 };
 
 // Update node detail popover
-function updateND() {
-  if (!selectedNode) { nodeDetail.classList.remove('visible'); updateStatus(); return; }
-  const n = selectedNode;
+export function updateND() {
+  if (!state.selectedNode) { nodeDetail.classList.remove('visible'); updateStatus(); return; }
+  const n = state.selectedNode;
   nodeDetail.classList.add('visible');
   document.getElementById('ndDot').style.background = n.color;
   const w = document.getElementById('ndWord');
@@ -23,15 +30,15 @@ function updateND() {
   const directNb = neighbors(n.id);
   const same = [...directNb].filter(id => nodes[id].cluster === n.cluster);
   const diff = [...directNb].filter(id => nodes[id].cluster !== n.cluster);
-  const totalVisible = depthMap ? depthMap.size - 1 : directNb.size;
+  const totalVisible = state.depthMap ? state.depthMap.size - 1 : directNb.size;
 
   document.getElementById('ndMeta').innerHTML =
     `<b>Cluster:</b> ${CLUSTER_NAMES[n.cluster]}<br>` +
     `<b>Direct:</b> ${directNb.size} connections \u00B7 ${diff.length} bridges` +
-    (selectionDepth > 1 ? `<br><b>Depth ${selectionDepth}:</b> ${totalVisible} nodes visible` : '');
+    (state.selectionDepth > 1 ? `<br><b>Depth ${state.selectionDepth}:</b> ${totalVisible} nodes visible` : '');
 
   document.querySelectorAll('.nd-depth-btn').forEach(b =>
-    b.classList.toggle('active', +b.dataset.depth === selectionDepth)
+    b.classList.toggle('active', +b.dataset.depth === state.selectionDepth)
   );
 
   document.getElementById('ndConnections').innerHTML = same.map(id => {
@@ -53,52 +60,52 @@ function updateND() {
 }
 
 // Path banner
-function updatePathBanner() {
+export function updatePathBanner() {
   const banner = document.getElementById('pathBanner');
   const pathNodes = document.getElementById('pathNodes');
-  if (!pathStart && !pathResult) {
+  if (!state.pathStart && !state.pathResult) {
     banner.classList.add('hidden');
     return;
   }
   banner.classList.remove('hidden');
-  if (pathResult) {
-    pathNodes.innerHTML = pathResult.map((id, i) => {
+  if (state.pathResult) {
+    pathNodes.innerHTML = state.pathResult.map((id, i) => {
       const n = nodes[id];
       return (i > 0 ? '<span class="path-arrow">\u2192</span>' : '') +
         `<span class="path-node" style="background:${n.color}30;color:${n.color}" onclick="selectNode(nodes[${id}]);updateND()">${n.word}</span>`;
     }).join('');
-  } else if (pathStart) {
-    pathNodes.innerHTML = `<span class="path-node" style="background:${pathStart.color}30;color:${pathStart.color}">${pathStart.word}</span>` +
+  } else if (state.pathStart) {
+    pathNodes.innerHTML = `<span class="path-node" style="background:${state.pathStart.color}30;color:${state.pathStart.color}">${state.pathStart.word}</span>` +
       '<span class="path-arrow">\u2192</span><span style="color:var(--text-muted);font-size:11px">click target node</span>';
   }
 }
 
 document.getElementById('pathClose').onclick = () => {
-  pathStart = null; pathResult = null; pathParticles = [];
-  labelVisCache = null;
+  state.pathStart = null; state.pathResult = null; state.pathParticles = [];
+  state.labelVisCache = null;
   updatePathBanner();
 };
 
 // Graph control buttons
 document.getElementById('btnHulls').onclick = function() {
-  showHulls = !showHulls;
-  this.classList.toggle('active', showHulls);
+  state.showHulls = !state.showHulls;
+  this.classList.toggle('active', state.showHulls);
 };
 
 document.getElementById('btnPathMode').onclick = function() {
-  pathMode = !pathMode;
-  this.classList.toggle('active', pathMode);
-  if (!pathMode) {
-    pathStart = null; pathResult = null; pathParticles = [];
-    labelVisCache = null;
+  state.pathMode = !state.pathMode;
+  this.classList.toggle('active', state.pathMode);
+  if (!state.pathMode) {
+    state.pathStart = null; state.pathResult = null; state.pathParticles = [];
+    state.labelVisCache = null;
     updatePathBanner();
   }
 };
 
 document.getElementById('btnMinimap').onclick = function() {
-  showMinimap = !showMinimap;
-  this.classList.toggle('active', showMinimap);
-  mmDiv.classList.toggle('hidden', !showMinimap);
+  state.showMinimap = !state.showMinimap;
+  this.classList.toggle('active', state.showMinimap);
+  mmDiv.classList.toggle('hidden', !state.showMinimap);
 };
 
 // Right panel close/toggle
@@ -132,9 +139,9 @@ document.querySelectorAll('.panel-tab').forEach(tab => {
 });
 
 // Status bar
-function updateStatus() {
+export function updateStatus() {
   const vis = nodes.filter(n => n.visible).length;
-  const sel = selectedNode ? ` \u00B7 Selected: ${selectedNode.word}` : '';
-  const srch = searchQuery ? ` \u00B7 Search: "${searchQuery}"` : '';
+  const sel = state.selectedNode ? ` \u00B7 Selected: ${state.selectedNode.word}` : '';
+  const srch = state.searchQuery ? ` \u00B7 Search: "${state.searchQuery}"` : '';
   document.getElementById('statusText').textContent = `${vis} nodes \u00B7 ${edges.length} edges${sel}${srch}`;
 }

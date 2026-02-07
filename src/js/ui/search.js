@@ -2,26 +2,31 @@
    MindGraph — Search & Cluster Filtering
    ============================================ */
 
-const searchInput = document.getElementById('searchInput');
+import { state } from '../core/state.js';
+import { nodes } from '../core/graph-data.js';
+import { CLUSTER_NAMES, CLUSTER_KEYWORDS } from '../core/config.js';
+import { updateStatus } from './panels.js';
+
+export const searchInput = document.getElementById('searchInput');
 const searchClear = document.getElementById('searchClear');
 const searchBox = document.getElementById('searchBox');
 
 searchInput.oninput = () => {
-  searchQuery = searchInput.value.trim().toLowerCase();
-  searchClear.classList.toggle('visible', searchQuery.length > 0);
-  searchBox.classList.toggle('active', searchQuery.length > 0);
-  nodes.forEach(n => n.matchesSearch = searchQuery ? n.word.includes(searchQuery) : true);
-  labelVisCache = null;
+  state.searchQuery = searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle('visible', state.searchQuery.length > 0);
+  searchBox.classList.toggle('active', state.searchQuery.length > 0);
+  nodes.forEach(n => n.matchesSearch = state.searchQuery ? n.word.includes(state.searchQuery) : true);
+  state.labelVisCache = null;
   updateStatus();
 };
 
 searchClear.onclick = () => {
   searchInput.value = '';
-  searchQuery = '';
+  state.searchQuery = '';
   searchClear.classList.remove('visible');
   searchBox.classList.remove('active');
   nodes.forEach(n => n.matchesSearch = true);
-  labelVisCache = null;
+  state.labelVisCache = null;
   updateStatus();
 };
 
@@ -36,19 +41,19 @@ CLUSTER_NAMES.forEach((name, ci) => {
   filterPills.appendChild(b);
 });
 
-function toggleCluster(ci) {
-  activeCluster = activeCluster === ci ? -1 : ci;
+export function toggleCluster(ci) {
+  state.activeCluster = state.activeCluster === ci ? -1 : ci;
   filterPills.querySelectorAll('.filter-pill').forEach(p =>
-    p.classList.toggle('dimmed', activeCluster !== -1 && +p.dataset.cluster !== activeCluster)
+    p.classList.toggle('dimmed', state.activeCluster !== -1 && +p.dataset.cluster !== state.activeCluster)
   );
   nodes.forEach(n => {
-    n.targetAlpha = (activeCluster === -1 || n.cluster === activeCluster) ? 1 : 0;
+    n.targetAlpha = (state.activeCluster === -1 || n.cluster === state.activeCluster) ? 1 : 0;
   });
   const h = nodes.filter(n => n.targetAlpha === 0).length;
   document.getElementById('hiddenLabel').textContent = h > 0 ? h + ' hidden' : '';
   document.querySelectorAll('.topic-card').forEach(tc =>
-    tc.classList.toggle('active', activeCluster === +tc.dataset.cluster)
+    tc.classList.toggle('active', state.activeCluster === +tc.dataset.cluster)
   );
-  labelVisCache = null;
+  state.labelVisCache = null;
   updateStatus();
 }

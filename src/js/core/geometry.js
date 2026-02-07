@@ -3,7 +3,7 @@
    ============================================ */
 
 // Graham scan convex hull
-function convexHull(points) {
+export function convexHull(points) {
   if (points.length < 3) return points;
   const pts = points.slice().sort((a, b) => a.x - b.x || a.y - b.y);
   const cross = (O, A, B) => (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
@@ -29,7 +29,7 @@ function convexHull(points) {
 }
 
 // Expand hull outward by padding
-function expandHull(hull, pad) {
+export function expandHull(hull, pad) {
   const cx = hull.reduce((s, p) => s + p.x, 0) / hull.length;
   const cy = hull.reduce((s, p) => s + p.y, 0) / hull.length;
   return hull.map(p => {
@@ -40,7 +40,7 @@ function expandHull(hull, pad) {
 }
 
 // Closed Catmull-Rom spline through all hull points
-function drawSmoothHull(ctx, hull, tension) {
+export function drawSmoothHull(ctx, hull, tension) {
   const n = hull.length;
   if (n < 3) return;
   const t = tension || 0.35;

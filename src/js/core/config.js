@@ -2,7 +2,7 @@
    MindGraph — Configuration & Constants
    ============================================ */
 
-const CLUSTER_NAMES = [
+export const CLUSTER_NAMES = [
   'Time & Feelings',
   'Journey & Movement',
   'Surprise & Discovery',
@@ -10,9 +10,9 @@ const CLUSTER_NAMES = [
   'Festival & Social'
 ];
 
-const CLUSTER_COLORS = ['#22c55e', '#f59e0b', '#06b6d4', '#ec4899', '#a855f7'];
+export const CLUSTER_COLORS = ['#22c55e', '#f59e0b', '#06b6d4', '#ec4899', '#a855f7'];
 
-const CLUSTER_KEYWORDS = [
+export const CLUSTER_KEYWORDS = [
   ['start', 'time', 'feel', 'realize', 'morning', 'gradually', 'walk', 'begin', 'moment', 'dream',
    'night', 'path', 'wonder', 'breath', 'calm', 'journey', 'rise', 'listen', 'open', 'slow'],
   ['back', 'leave', 'meet', 'arrive', 'return', 'drive', 'car', 'boat', 'end', 'turn',
@@ -25,8 +25,7 @@ const CLUSTER_KEYWORDS = [
    'happening', 'work', 'workshop', 'studio', 'book', 'project', 'big', 'point', 'guy', 'make'],
 ];
 
-// Cross-cluster bridge definitions: [clusterA, clusterB, wordA, wordB]
-const CROSS_CLUSTER_BRIDGES = [
+export const CROSS_CLUSTER_BRIDGES = [
   [0,1,'start','arrive'], [0,1,'moment','return'], [0,1,'walk','go'], [0,1,'feel','leave'],
   [0,2,'feel','nice'], [0,2,'realize','discover'], [0,2,'wonder','curious'], [0,2,'calm','quiet'],
   [0,3,'morning','room'], [0,3,'dream','house'], [0,3,'night','bedroom'], [0,3,'path','hallway'],
@@ -39,5 +38,5 @@ const CROSS_CLUSTER_BRIDGES = [
   [3,4,'house','festival'], [3,4,'place','event'], [3,4,'room','studio'], [3,4,'door','work'],
 ];
 
-const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
-const FLY_DURATION = 400;
+export const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+export const FLY_DURATION = 400;

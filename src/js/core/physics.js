@@ -2,9 +2,12 @@
    MindGraph — Force-Directed Physics Simulation
    ============================================ */
 
-function simulate() {
-  if (W < 10 || H < 10) return;
-  const cx = W * 0.45, cy = H * 0.48, sp = Math.min(W, H);
+import { state } from './state.js';
+import { nodes, edges, NUM_NODES } from './graph-data.js';
+
+export function simulate() {
+  if (state.W < 10 || state.H < 10) return;
+  const cx = state.W * 0.45, cy = state.H * 0.48, sp = Math.min(state.W, state.H);
 
   // Spring forces from edges
   for (const e of edges) {
@@ -93,13 +96,13 @@ function simulate() {
     n.vy += (Math.random() - 0.5) * 0.04;
     n.vx *= 0.90; n.vy *= 0.90;
     n.x += n.vx; n.y += n.vy;
-    n.x = Math.max(30, Math.min(W - 30, n.x));
-    n.y = Math.max(30, Math.min(H - 30, n.y));
+    n.x = Math.max(30, Math.min(state.W - 30, n.x));
+    n.y = Math.max(30, Math.min(state.H - 30, n.y));
   }
 }
 
-function positionNodes() {
-  const cx = W * 0.45, cy = H * 0.48, sp = Math.min(W, H);
+export function positionNodes() {
+  const cx = state.W * 0.45, cy = state.H * 0.48, sp = Math.min(state.W, state.H);
   for (const n of nodes) {
     if (n.pinned) continue;
     n.x = cx + Math.cos(n._a) * n._d * sp + n._jx * sp;

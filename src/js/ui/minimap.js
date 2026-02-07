@@ -2,15 +2,18 @@
    MindGraph — Minimap
    ============================================ */
 
+import { state } from '../core/state.js';
+import { nodes, edges } from '../core/graph-data.js';
+
 const mmCanvas = document.getElementById('minimapCanvas');
 const mmCtx = mmCanvas.getContext('2d');
-const mmDiv = document.getElementById('minimap');
+export const mmDiv = document.getElementById('minimap');
 const mmVP = document.getElementById('minimapViewport');
 
 let mmTransform = null;
 
-function drawMinimap() {
-  if (!showMinimap) return;
+export function drawMinimap() {
+  if (!state.showMinimap) return;
   const mw = 160, mh = 120;
   mmCanvas.width = mw * devicePixelRatio;
   mmCanvas.height = mh * devicePixelRatio;
@@ -57,8 +60,8 @@ function drawMinimap() {
   mmCtx.globalAlpha = 1;
 
   // Viewport rectangle
-  const vx0 = -camX / camZoom, vy0 = -camY / camZoom;
-  const vw = W / camZoom, vh = H / camZoom;
+  const vx0 = -state.camX / state.camZoom, vy0 = -state.camY / state.camZoom;
+  const vw = state.W / state.camZoom, vh = state.H / state.camZoom;
   const rx = ox + (vx0 - minX) * scale, ry = oy + (vy0 - minY) * scale;
   const rw = vw * scale, rh = vh * scale;
   mmVP.style.left = Math.max(0, rx) + 'px';
@@ -75,9 +78,9 @@ function mmPanTo(e) {
   const my = e.clientY - rect.top;
   const worldX = (mx - mmTransform.ox) / mmTransform.scale + mmTransform.minX;
   const worldY = (my - mmTransform.oy) / mmTransform.scale + mmTransform.minY;
-  camX = -worldX * camZoom + W / 2;
-  camY = -worldY * camZoom + H / 2;
-  labelVisCache = null;
+  state.camX = -worldX * state.camZoom + state.W / 2;
+  state.camY = -worldY * state.camZoom + state.H / 2;
+  state.labelVisCache = null;
 }
 
 let mmDragging = false;

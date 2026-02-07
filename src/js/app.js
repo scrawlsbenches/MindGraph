@@ -2,6 +2,30 @@
    MindGraph — Application Entry Point
    ============================================ */
 
+import { state } from './core/state.js';
+import { CLUSTER_NAMES, CLUSTER_COLORS } from './core/config.js';
+import { nodes } from './core/graph-data.js';
+import { simulate, positionNodes } from './core/physics.js';
+import { resize, graphArea, updateFlyTo } from './core/camera.js';
+import { draw } from './ui/renderer.js';
+import { drawMinimap } from './ui/minimap.js';
+import { selectNode } from './ui/interaction.js';
+import { toggleCluster, searchInput } from './ui/search.js';
+import { updateND, updateStatus, panelContent } from './ui/panels.js';
+import { buildTab0 } from './analytics/tabs.js';
+
+// For inline onclick handlers in dynamically generated HTML
+window.selectNode = selectNode;
+window.updateND = updateND;
+window.toggleCluster = toggleCluster;
+window.nodes = nodes;
+window.searchInput = searchInput;
+// activeCluster is on state object, so make a getter
+Object.defineProperty(window, 'activeCluster', {
+  get: () => state.activeCluster,
+  set: (v) => { state.activeCluster = v; }
+});
+
 // Initialize canvas & layout
 resize();
 window.addEventListener('resize', () => { resize(); positionNodes(); });
@@ -58,11 +82,11 @@ function loop() {
     }
     n.visible = n.alpha > 0.02;
   }
-  if (anyTransitioning) labelVisCache = null;
+  if (anyTransitioning) state.labelVisCache = null;
 
   simulate();
   draw();
-  if (showMinimap && frameCount % 3 === 0) drawMinimap();
+  if (state.showMinimap && frameCount % 3 === 0) drawMinimap();
   frameCount++;
   requestAnimationFrame(loop);
 }

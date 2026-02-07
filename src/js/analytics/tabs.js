@@ -2,12 +2,15 @@
    MindGraph — Analytics Tab Builders
    ============================================ */
 
+import { nodes, adj, edges, NUM_NODES } from '../core/graph-data.js';
+import { CLUSTER_NAMES, CLUSTER_KEYWORDS, CLUSTER_COLORS } from '../core/config.js';
+
 // Helper: compute degrees
 function computeDegrees() {
   return nodes.map(n => ({ n, deg: adj.get(n.id)?.size || 0 }));
 }
 
-function computeBridgeScore(n) {
+export function computeBridgeScore(n) {
   const nb = adj.get(n.id) || new Set();
   return [...nb].filter(id => nodes[id].cluster !== n.cluster).length;
 }
@@ -67,7 +70,7 @@ function wordHash(w, i) {
 }
 
 // ---- Tab 1: AI Insights ----
-function buildTab0() {
+export function buildTab0() {
   const stats = CLUSTER_NAMES.map((name, ci) => {
     const cn = nodes.filter(n => n.cluster === ci);
     const ce = edges.filter(e => nodes[e.a].cluster === ci && nodes[e.b].cluster === ci);
@@ -113,7 +116,7 @@ function buildTab0() {
 }
 
 // ---- Tab 2: Main Ideas ----
-function buildTab1() {
+export function buildTab1() {
   const degs = computeDegrees().sort((a, b) => b.deg - a.deg);
   const maxDeg = degs[0]?.deg || 1;
 
@@ -146,7 +149,7 @@ function buildTab1() {
 }
 
 // ---- Tab 3: Content Gaps ----
-function buildTab2() {
+export function buildTab2() {
   const matrix = computeClusterEdgeMatrix();
 
   let h = `<div class="section-header"><h3>Cluster Connectivity Matrix</h3><span class="subtitle">(cross-cluster edges)</span></div>`;
@@ -196,7 +199,7 @@ function buildTab2() {
 }
 
 // ---- Tab 4: Relations ----
-function buildTab3() {
+export function buildTab3() {
   let h = `<div class="section-header"><h3>Cross-Cluster Relations</h3><span class="subtitle">(how topics connect through bridge words)</span></div>`;
 
   const pairMap = {};
@@ -246,7 +249,7 @@ function buildTab3() {
 }
 
 // ---- Tab 5: Sentiment ----
-function buildTab4() {
+export function buildTab4() {
   let h = `<div class="section-header"><h3>Semantic Tone Analysis</h3><span class="subtitle">(word-level sentiment per cluster)</span></div>`;
 
   h += `<div class="sentiment-legend">
@@ -296,7 +299,7 @@ function buildTab4() {
 }
 
 // ---- Tab 6: Stats ----
-function buildTab5() {
+export function buildTab5() {
   const density = computeGraphDensity();
   const avgDeg = computeAvgDegree();
   const clustCoeff = computeClusteringCoeff();
@@ -338,7 +341,7 @@ function buildTab5() {
 }
 
 // ---- Tab 7: Trends ----
-function buildTab6() {
+export function buildTab6() {
   let h = `<div class="section-header"><h3>Concept Frequency Over Time</h3><span class="subtitle">(simulated temporal distribution)</span></div>`;
 
   const topNodes = [...nodes].sort((a, b) => (adj.get(b.id)?.size || 0) - (adj.get(a.id)?.size || 0)).slice(0, 10);
@@ -376,7 +379,7 @@ function buildTab6() {
 }
 
 // ---- Tab 8: Structure ----
-function buildTab7() {
+export function buildTab7() {
   const degs = computeDegrees();
   const avgDeg = degs.reduce((s, d) => s + d.deg, 0) / degs.length;
 

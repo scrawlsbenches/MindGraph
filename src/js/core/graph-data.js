@@ -2,9 +2,11 @@
    MindGraph — Graph Data (Nodes & Edges)
    ============================================ */
 
-const nodes = [];
-const edges = [];
-const adj = new Map();
+import { CLUSTER_KEYWORDS, CLUSTER_COLORS, CROSS_CLUSTER_BRIDGES } from './config.js';
+
+export const nodes = [];
+export const edges = [];
+export const adj = new Map();
 
 // Build nodes from cluster keywords
 (function buildNodes() {
@@ -31,7 +33,6 @@ const adj = new Map();
     });
   });
 
-  // Precompute label footprint dimensions for physics
   for (const n of nodes) {
     const fs = Math.max(9, n.r * 1.2);
     n.labelW = n.word.length * fs * 0.55;
@@ -42,9 +43,8 @@ const adj = new Map();
   }
 })();
 
-const NUM_NODES = nodes.length;
+export const NUM_NODES = nodes.length;
 
-// Edge helpers
 function addEdge(a, b, w) {
   if (a === b) return;
   const k = Math.min(a, b) + '-' + Math.max(a, b);
@@ -56,7 +56,6 @@ function addEdge(a, b, w) {
   adj.get(b).add(a);
 }
 
-// Dense intra-cluster edges
 (function buildIntraClusterEdges() {
   CLUSTER_KEYWORDS.forEach((words, ci) => {
     const base = ci * 20;
@@ -69,7 +68,6 @@ function addEdge(a, b, w) {
         if (j !== i) addEdge(base + i, base + j, 0.5 + Math.random() * 0.5);
       }
     }
-    // Top-4 fully connected
     for (let i = 0; i < 4; i++) {
       for (let j = i + 1; j < 4; j++) {
         addEdge(base + i, base + j, 0.8 + Math.random() * 0.2);
@@ -78,7 +76,6 @@ function addEdge(a, b, w) {
   });
 })();
 
-// Cross-cluster bridges
 (function buildCrossClusterEdges() {
   CROSS_CLUSTER_BRIDGES.forEach(([c1, c2, w1, w2]) => {
     const n1 = nodes.find(n => n.cluster === c1 && n.word === w1);
@@ -87,8 +84,6 @@ function addEdge(a, b, w) {
   });
 })();
 
-const NUM_EDGES = edges.length;
-
-function neighbors(id) {
+export function neighbors(id) {
   return adj.get(id) || new Set();
 }

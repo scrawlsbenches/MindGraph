@@ -2,8 +2,10 @@
    MindGraph — Pathfinding & Neighborhood
    ============================================ */
 
+import { adj, nodes } from './graph-data.js';
+
 // BFS shortest path between two nodes
-function bfsPath(startId, endId) {
+export function bfsPath(startId, endId) {
   if (startId === endId) return [startId];
   const visited = new Set([startId]);
   const queue = [[startId]];
@@ -23,7 +25,7 @@ function bfsPath(startId, endId) {
 }
 
 // N-depth neighborhood from a node
-function getNeighborsAtDepth(nodeId, depth) {
+export function getNeighborsAtDepth(nodeId, depth) {
   const result = new Map();
   result.set(nodeId, 0);
   let frontier = new Set([nodeId]);
