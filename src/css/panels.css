@@ -1,0 +1,158 @@
+/* ============================================
+   MindGraph — Right Analytics Panel
+   ============================================ */
+.right-panel {
+  width: 320px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 250ms ease, opacity 200ms ease;
+}
+
+.right-panel.collapsed {
+  width: 0;
+  opacity: 0;
+  border-left: none;
+  pointer-events: none;
+}
+
+.right-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.right-panel-header h2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.right-panel-header .close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* Panel tabs */
+.panel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-tab {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.panel-tab:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.panel-tab.active {
+  background: var(--accent-blue);
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+/* Panel content area */
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.section-header h3 { font-size: 13px; font-weight: 700; }
+.section-header .subtitle { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+
+.section-header-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.small-btn {
+  font-family: inherit;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.small-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 14px 0;
+}
+
+/* Action rows & buttons */
+.action-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+
+.action-btn {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.action-btn.primary {
+  background: var(--accent-orange);
+  color: #000;
+  border-color: var(--accent-orange);
+  font-weight: 600;
+}
+
+.action-btn.highlight {
+  background: var(--accent-green);
+  color: #000;
+  border-color: var(--accent-green);
+  font-weight: 600;
+}

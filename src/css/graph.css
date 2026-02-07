@@ -1,0 +1,364 @@
+/* ============================================
+   MindGraph — Graph Area & Overlays
+   ============================================ */
+
+/* Graph canvas area */
+.graph-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.graph-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.graph-canvas.grabbing { cursor: grabbing; }
+.graph-canvas.node-hover { cursor: pointer; }
+
+/* Node tooltip */
+.node-tooltip {
+  position: absolute;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--text-primary);
+  pointer-events: none;
+  z-index: 200;
+  display: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+.tt-word { font-weight: 700; font-size: 13px; }
+.tt-cluster { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.tt-connections {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 4px;
+}
+
+/* Node detail popover */
+.node-detail {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 80;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-panel);
+  width: 320px;
+  display: none;
+  max-height: 50%;
+  overflow-y: auto;
+}
+
+.node-detail.visible { display: block; }
+
+.node-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.node-detail-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.node-detail-word { font-size: 16px; font-weight: 700; }
+
+.node-detail-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.node-detail-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.node-detail-section {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 10px 0 6px;
+}
+
+.node-detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.nd-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.nd-chip:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.nd-chip .cd {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Depth toggle */
+.nd-depth-toggle {
+  display: flex;
+  gap: 4px;
+  margin: 8px 0 4px;
+}
+
+.nd-depth-btn {
+  font-family: inherit;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.nd-depth-btn.active {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--accent-cyan);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+/* Graph legend */
+.graph-legend {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 60;
+  background: rgba(15, 22, 41, 0.85);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-size: 10px;
+  backdrop-filter: blur(6px);
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+  color: var(--text-secondary);
+}
+
+.legend-row:last-child { margin-bottom: 0; }
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Graph hint */
+.graph-hint {
+  position: absolute;
+  bottom: 140px;
+  right: 14px;
+  z-index: 60;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: rgba(15, 22, 41, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  backdrop-filter: blur(6px);
+  line-height: 1.6;
+  transition: opacity 0.5s ease;
+}
+
+/* Graph controls overlay */
+.graph-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.graph-ctrl-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: rgba(15, 22, 41, 0.85);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+
+.graph-ctrl-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.graph-ctrl-btn.active {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--accent-cyan);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+.graph-ctrl-btn .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Panel toggle button */
+.panel-toggle-btn {
+  position: absolute;
+  top: 120px;
+  right: 10px;
+  z-index: 60;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all var(--transition);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.panel-toggle-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.panel-toggle-btn.visible { display: flex; }
+
+/* Path finder banner */
+.path-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  background: rgba(15, 22, 41, 0.92);
+  border: 1px solid var(--accent-cyan);
+  border-radius: var(--radius-lg);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.15);
+  backdrop-filter: blur(8px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.path-banner.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-20px);
+  pointer-events: none;
+}
+
+.path-banner .path-nodes { display: flex; align-items: center; gap: 4px; }
+.path-banner .path-node {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  transition: filter var(--transition);
+}
+.path-banner .path-node:hover { filter: brightness(1.3); }
+.path-banner .path-arrow { color: var(--text-muted); font-size: 10px; }
+.path-banner .path-label { color: var(--text-secondary); font-size: 11px; }
+.path-banner .path-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* Minimap */
+.minimap {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 65;
+  width: 160px;
+  height: 120px;
+  background: rgba(10, 14, 23, 0.9);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: crosshair;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.minimap.hidden { opacity: 0; pointer-events: none; }
+.minimap canvas { width: 100%; height: 100%; }
+
+.minimap-viewport {
+  position: absolute;
+  border: 1.5px solid var(--accent-cyan);
+  border-radius: 1px;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.3);
+}

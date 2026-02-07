@@ -1,0 +1,46 @@
+/* ============================================
+   MindGraph — Left Sidebar
+   ============================================ */
+.left-sidebar {
+  width: 40px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.sidebar-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  border: none;
+  background: none;
+  font-size: 15px;
+}
+
+.sidebar-icon:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.sidebar-icon.active {
+  background: var(--bg-tertiary);
+  color: var(--accent-cyan);
+}
+
+.sidebar-divider {
+  width: 20px;
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}

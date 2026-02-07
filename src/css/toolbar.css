@@ -1,0 +1,84 @@
+/* ============================================
+   MindGraph — Toolbar
+   ============================================ */
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.tool-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.tool-btn.accent {
+  background: var(--accent-green);
+  color: #000;
+  border-color: var(--accent-green);
+  font-weight: 600;
+}
+
+.tool-btn.accent:hover {
+  background: #16a34a;
+}
+
+/* Filter pills */
+.filter-pills {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.filter-pill {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  opacity: 1;
+}
+
+.filter-pill:hover {
+  transform: scale(1.05);
+}
+
+.filter-pill.dimmed {
+  opacity: 0.35;
+}
+
+.filter-pill[data-cluster="0"] { background: var(--cluster-0); color: #000; }
+.filter-pill[data-cluster="1"] { background: var(--cluster-1); color: #000; }
+.filter-pill[data-cluster="2"] { background: var(--cluster-2); color: #000; }
+.filter-pill[data-cluster="3"] { background: var(--cluster-3); color: #fff; }
+.filter-pill[data-cluster="4"] { background: var(--cluster-4); color: #fff; }
+
+.hidden-nodes-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-left: 6px;
+}
