@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindGraph — Network Text Analytics</title>
+<link rel="stylesheet" href="mindgraph.min.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <button class="menu-btn">&#9776;</button>
+  <div class="doc-title" id="docTitle">untitled_document</div>
+  <div class="mode-toggle">
+    <span>advanced mode</span>
+    <div class="toggle-track" id="modeToggle"></div>
+  </div>
+  <select class="graph-type-select" id="graphTypeSelect">
+    <option>visible graph</option>
+    <option>full graph</option>
+    <option>filtered graph</option>
+  </select>
+  <div class="top-bar-spacer"></div>
+  <div class="search-box" id="searchBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="search nodes&#8230;" id="searchInput">
+    <button class="search-clear" id="searchClear">&#10005;</button>
+  </div>
+  <div class="brand">MindGraph</div>
+  <div class="user-avatar" id="userAvatar">A</div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar-row">
+  <button class="tool-btn" id="btnFilter">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+    </svg>
+    Filter By
+  </button>
+  <button class="tool-btn" id="btnCompare">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="9" y="9" width="13" height="13" rx="2"/>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+    </svg>
+    Compare To
+  </button>
+  <button class="tool-btn accent" id="btnAISummarise">&#10022; AI: Summarise</button>
+  <div class="filter-pills" id="filterPills"></div>
+  <span class="hidden-nodes-label" id="hiddenLabel"></span>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+  <!-- Left Sidebar -->
+  <div class="left-sidebar">
+    <button class="sidebar-icon" title="Settings">&#9881;</button>
+    <button class="sidebar-icon active" title="Graph view">&#9678;</button>
+    <button class="sidebar-icon" title="Layout">&#8862;</button>
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-icon" title="Zoom in" id="btnZoomIn">&#65291;</button>
+    <button class="sidebar-icon" title="Zoom out" id="btnZoomOut">&#8722;</button>
+    <button class="sidebar-icon" title="Fit view" id="btnFit">&#9723;</button>
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-icon" title="Unpin all" id="btnUnpin">&#8853;</button>
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-icon" title="Export">&#8595;</button>
+    <button class="sidebar-icon" title="Help">?</button>
+  </div>
+
+  <!-- Graph Area -->
+  <div class="graph-area" id="graphArea">
+    <canvas class="graph-canvas" id="graphCanvas"></canvas>
+    <div class="graph-legend" id="graphLegend"></div>
+    <div class="graph-hint" id="graphHint">
+      Scroll to zoom &middot; Drag to pan &middot; Click node to explore &middot; Shift+click two nodes to find path
+    </div>
+
+    <!-- Graph Controls Overlay -->
+    <div class="graph-controls" id="graphControls">
+      <button class="graph-ctrl-btn active" id="btnHulls">&#9678; Cluster hulls</button>
+      <button class="graph-ctrl-btn" id="btnPathMode">&#8674; Path finder</button>
+      <button class="graph-ctrl-btn active" id="btnMinimap">&#8865; Minimap</button>
+    </div>
+
+    <!-- Path Finder Banner -->
+    <div class="path-banner hidden" id="pathBanner">
+      <span class="path-label">Path:</span>
+      <div class="path-nodes" id="pathNodes"></div>
+      <button class="path-close" id="pathClose">&#10005;</button>
+    </div>
+
+    <!-- Minimap -->
+    <div class="minimap" id="minimap">
+      <canvas id="minimapCanvas"></canvas>
+      <div class="minimap-viewport" id="minimapViewport"></div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="node-tooltip" id="tooltip"></div>
+
+    <!-- Panel Toggle -->
+    <button class="panel-toggle-btn" id="panelToggle" title="Open Analytics Panel">&#9776;</button>
+
+    <!-- Node Detail Popover -->
+    <div class="node-detail" id="nodeDetail">
+      <div class="node-detail-header">
+        <div class="node-detail-dot" id="ndDot"></div>
+        <div class="node-detail-word" id="ndWord"></div>
+        <button class="node-detail-close" id="ndClose">&#10005;</button>
+      </div>
+      <div class="node-detail-meta" id="ndMeta"></div>
+      <div class="nd-depth-toggle">
+        <button class="nd-depth-btn active" data-depth="1">Depth 1</button>
+        <button class="nd-depth-btn" data-depth="2">Depth 2</button>
+        <button class="nd-depth-btn" data-depth="3">Depth 3</button>
+      </div>
+      <div class="node-detail-section">Same-Cluster Connections</div>
+      <div class="node-detail-list" id="ndConnections"></div>
+      <div class="node-detail-section">Cross-Cluster Bridges</div>
+      <div class="node-detail-list" id="ndBridges"></div>
+    </div>
+
+    <!-- AI Chat Panel -->
+    <div class="ai-chat-panel" id="aiChat">
+      <div class="ai-chat-header">
+        <h3>MindGraph AI</h3>
+        <button title="History">&#9201;</button>
+        <button title="Settings">&#9881;</button>
+        <button title="Close" id="aiChatClose">&#10005;</button>
+      </div>
+      <div class="ai-chat-action">
+        <button class="ai-chat-action-btn">Summarise the graph structure</button>
+      </div>
+      <div class="ai-chat-body" id="aiChatBody">
+        <h4>Routine Escape:</h4>
+        <p>A mundane walk to work triggers a realization about a life lived out of obligation, sparking a pivot towards spontaneous joy. Connecting with family represents a choice to prioritize fulfillment.</p>
+        <h4>Social Encounters:</h4>
+        <p>A festival serves as a backdrop for surreal social dynamics. The collective presence of people outweighs any actual event, fostering bizarre interactions and highlighting unpredictability.</p>
+        <h4>Spatial Transitions:</h4>
+        <p>Movement through rooms reflects internal emotional states. Each room carries its own atmosphere, creating a dreamlike quality where physical navigation mirrors psychological exploration.</p>
+      </div>
+      <div class="ai-chat-footer">
+        <div class="ai-chat-footer-tag">
+          graph summary : summarizes the main topics
+          <span class="close-tag">&#10005;</span>
+        </div>
+        <div class="ai-chat-input-row">
+          <input class="ai-chat-input" type="text" placeholder="Ask me anything about this content&#8230;">
+          <button class="ai-send-btn">&#8593;</button>
+        </div>
+        <div class="ai-model-label">Graph summary &middot; Claude 4.5 Sonnet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Analytics Panel -->
+  <div class="right-panel" id="rightPanel">
+    <div class="right-panel-header">
+      <h2>Analytics Panel</h2>
+      <button class="close-btn" id="panelClose">&#10005;</button>
+    </div>
+    <div class="panel-tabs" id="panelTabs">
+      <button class="panel-tab active" data-tab="0">1. AI Insights</button>
+      <button class="panel-tab" data-tab="1">2. Main Ideas</button>
+      <button class="panel-tab" data-tab="2">3. Content Gaps</button>
+      <button class="panel-tab" data-tab="3">4. Relations</button>
+      <button class="panel-tab" data-tab="4">5. Sentiment</button>
+      <button class="panel-tab" data-tab="5">6. Stats</button>
+      <button class="panel-tab" data-tab="6">7. Trends</button>
+      <button class="panel-tab" data-tab="7">8. Structure</button>
+    </div>
+    <div class="panel-content" id="panelContent"></div>
+  </div>
+</div>
+
+<!-- Bottom Status Bar -->
+<div class="bottom-bar">
+  <div class="dot"></div>
+  <span id="statusText">Loading&#8230;</span>
+  <span>|</span>
+  <span>Exploring ideas with AI graphs</span>
+  <span class="model-tag">Claude 4.5 Sonnet</span>
+</div>
+
+<script src="mindgraph.min.js"></script>
+</body>
+</html>

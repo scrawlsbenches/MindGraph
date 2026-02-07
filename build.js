@@ -24,11 +24,19 @@ async function build() {
     metafile: true,
   });
 
+  // Generate dist/index.html with local asset paths
+  const html = fs.readFileSync('index.html', 'utf8')
+    .replace('dist/mindgraph.min.css', 'mindgraph.min.css')
+    .replace('dist/mindgraph.min.js', 'mindgraph.min.js');
+  fs.writeFileSync('dist/index.html', html);
+
   // Report sizes
   const jsSize = fs.statSync('dist/mindgraph.min.js').size;
   const cssSize = fs.statSync('dist/mindgraph.min.css').size;
-  console.log(`JS:  ${(jsSize / 1024).toFixed(1)} KB (dist/mindgraph.min.js)`);
-  console.log(`CSS: ${(cssSize / 1024).toFixed(1)} KB (dist/mindgraph.min.css)`);
+  const htmlSize = fs.statSync('dist/index.html').size;
+  console.log(`HTML: ${(htmlSize / 1024).toFixed(1)} KB (dist/index.html)`);
+  console.log(`JS:   ${(jsSize / 1024).toFixed(1)} KB (dist/mindgraph.min.js)`);
+  console.log(`CSS:  ${(cssSize / 1024).toFixed(1)} KB (dist/mindgraph.min.css)`);
 
   // Show module breakdown
   const jsText = esbuild.analyzeMetafileSync(jsResult.metafile);
