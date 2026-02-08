@@ -25,6 +25,10 @@ MindGraph/                          (727 KB total)
 ├── package-lock.json               # Lockfile
 ├── README.md                       # Project documentation (99 lines)
 ├── .gitignore                      # Ignore rules
+├── tests/                          # Unit tests (Vitest)
+│   ├── geometry.test.js            # convexHull, expandHull (10 tests)
+│   ├── pathfinding.test.js         # bfsPath, getNeighborsAtDepth (14 tests)
+│   └── tabs-helpers.test.js        # wordSentiment, bridgeScore, degrees, density, clustering (11 tests)
 ├── dist/                           # Production build output
 │   ├── index.html                  # Self-contained (8 KB)
 │   ├── mindgraph.min.js            # Bundled JS (42 KB)
@@ -73,7 +77,7 @@ MindGraph/                          (727 KB total)
 | Build | esbuild 0.27.3 | IIFE bundle + minification + source maps |
 | Package Manager | npm | Node >= 18 required |
 | Frameworks | None | Zero runtime dependencies |
-| Testing | None | No test framework configured |
+| Testing | Vitest 4.0 + @vitest/coverage-v8 | 35 unit tests across 3 files |
 | Linting | ESLint 10 + Prettier 3 | Flat config, eslint-config-prettier |
 | CI/CD | None | No GitHub Actions or pipelines |
 | Type Checking | TypeScript 5.9 (checkJs) | `tsc --noEmit`, type declarations in `src/types/` |
@@ -130,7 +134,7 @@ The application has no runtime dependencies. All functionality is implemented fr
 - Rendering (Canvas 2D API)
 - UI interactions (vanilla DOM events)
 
-### Dev Dependencies: **Six**
+### Dev Dependencies: **Eight**
 
 | Package | Version | Purpose |
 |---|---|---|
@@ -140,6 +144,8 @@ The application has no runtime dependencies. All functionality is implemented fr
 | eslint-config-prettier | ^10.1.8 | Disable ESLint rules that conflict with Prettier |
 | prettier | ^3.8.1 | Code formatting |
 | typescript | ^5.9.3 | Type checking (checkJs, no emit) |
+| vitest | ^4.0.18 | Unit test framework |
+| @vitest/coverage-v8 | ^4.0.18 | Test coverage reporting |
 
 ### Missing Dependencies (recommended)
 
@@ -234,8 +240,8 @@ The commit history is clean and logical, showing a deliberate refactoring from p
 | CSS lines | 1,433 |
 | Source files | 26 (14 JS + 10 CSS + 2 .d.ts) |
 | Runtime dependencies | 0 |
-| Dev dependencies | 6 |
-| Test coverage | 0% |
+| Dev dependencies | 8 |
+| Test coverage | Unit tests: 35 passing (geometry, pathfinding, analytics helpers) |
 | Linting rules | ESLint recommended + Prettier |
 | Type checking | TypeScript checkJs (0 errors) |
 | CI/CD pipelines | None |

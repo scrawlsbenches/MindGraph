@@ -78,9 +78,9 @@ These are hygiene items that should be done before any feature work.
 
 | # | Item | Effort | Impact |
 |---|---|---|---|
-| 1.1 | Add Vitest + unit tests for `core/geometry.js` | 1 session | Test convexHull, expandHull |
-| 1.2 | Add unit tests for `core/pathfinding.js` | 1 session | Test bfsPath, getNeighborsAtDepth |
-| 1.3 | Add unit tests for `analytics/tabs.js` helpers | 1 session | Test computeDegrees, bridgeScore, sentiment |
+| 1.1 | ~~Add Vitest + unit tests for `core/geometry.js`~~ | ~~1 session~~ | ~~Done — 10 tests~~ |
+| 1.2 | ~~Add unit tests for `core/pathfinding.js`~~ | ~~1 session~~ | ~~Done — 14 tests~~ |
+| 1.3 | ~~Add unit tests for `analytics/tabs.js` helpers~~ | ~~1 session~~ | ~~Done — 11 tests~~ |
 | 1.4 | Add GitHub Actions CI pipeline | 1 session | Automated build + lint + test on PR |
 | 1.5 | Add Husky pre-commit hooks | 30 min | Prevent bad commits |
 | 1.6 | Add Playwright smoke test | 1 session | Page load + basic interaction |

@@ -26,7 +26,10 @@ npm run lint:fix     # ESLint with auto-fix
 npm run format       # Prettier (write)
 npm run format:check # Prettier (check only)
 npm run typecheck    # TypeScript checkJs (no emit)
-npm run check        # lint + typecheck + build (full CI check)
+npm run check        # lint + typecheck + test + build (full CI check)
+npm run test         # Vitest unit tests (35 tests)
+npm run test:watch   # Vitest watch mode
+npm run test:coverage # Vitest with coverage
 open index.html      # Run locally (loads dist/ bundles)
 ```
 
@@ -50,11 +53,15 @@ MindGraph/
 ├── LICENSE                         # ISC license
 ├── index.html                      # Application shell (192 lines, element IDs used by JS)
 ├── build.js                        # esbuild config (CJS, bundles src/ → dist/)
-├── package.json                    # Dev deps: esbuild, eslint, prettier, typescript
+├── package.json                    # Dev deps: esbuild, eslint, prettier, typescript, vitest
 ├── eslint.config.js                # ESLint flat config (recommended + prettier)
 ├── .prettierrc                     # Prettier config (single quotes, 2-space, semi)
 ├── .editorconfig                   # Editor settings (indent, EOL, charset)
 ├── tsconfig.json                   # TypeScript checkJs config (no emit)
+├── tests/                          # Unit tests (Vitest, 35 tests)
+│   ├── geometry.test.js            # convexHull, expandHull (10 tests)
+│   ├── pathfinding.test.js         # bfsPath, getNeighborsAtDepth (14 tests)
+│   └── tabs-helpers.test.js        # wordSentiment, bridgeScore, degrees, density, clustering (11 tests)
 ├── dist/                           # Build output (.gitignored)
 │   ├── index.html
 │   ├── mindgraph.min.js            # + source map
@@ -175,8 +182,8 @@ window.nodes, window.searchInput, window.activeCluster (getter/setter)
 
 Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
 
-### CRITICAL
-- **Zero test coverage** — No unit, integration, or E2E tests exist
+### ~~CRITICAL~~ [RESOLVED]
+- ~~**Zero test coverage**~~ — 35 unit tests now cover geometry, pathfinding, and analytics helpers. Remaining: integration, visual regression, E2E.
 
 ### HIGH
 - **HTML string concatenation with inline onclick** — `tabs.js` (433 lines) builds all analytics HTML via string concat with `window` global calls. XSS surface if data becomes dynamic.
@@ -340,12 +347,12 @@ docTitle        → index.html only (static)
 
 ## Roadmap Summary
 
-Full details in `ROADMAP.md`. Current phase: **Phase 0 (Foundation)**.
+Full details in `ROADMAP.md`. Current phase: **Phase 1 (Quality Gates)**.
 
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | ESLint, Prettier, tsconfig checkJs, remove dead files, .gitignore dist/ | **Done** |
-| 1 | Vitest unit tests, GitHub Actions CI, Playwright smoke test | Not started |
+| 1 | Vitest unit tests, GitHub Actions CI, Playwright smoke test | **In progress** (unit tests done, CI + Playwright remaining) |
 | 2 | TypeScript migration (core/ first, then ui/, then analytics/) | Not started |
 | 3 | Architecture fixes (events, extract data from tabs, seeded PRNG, decompose renderer) | Not started |
 | 4 | Features (data import/export, persistence, real AI chat, responsive, a11y) | Not started |
@@ -357,29 +364,25 @@ Full details in `ROADMAP.md`. Current phase: **Phase 0 (Foundation)**.
 2. ~~Add `dist/` to `.gitignore`~~ Done.
 3. ~~Add ESLint + Prettier~~ Done.
 4. ~~Add `tsconfig.json` with `allowJs` + `checkJs`~~ Done.
-5. Add Vitest + first unit test (`convexHull`)
-6. Add seeded PRNG to `graph-data.js`
+5. ~~Add Vitest + unit tests (geometry, pathfinding, analytics helpers)~~ Done.
+6. Add GitHub Actions CI pipeline
+7. Add seeded PRNG to `graph-data.js`
 7. Define TypeScript interfaces for Node, Edge, State
 8. Migrate `core/state.ts` as first TypeScript file
 
 ---
 
-## Testing Strategy (When Implemented)
+## Testing
 
-### Unit Tests (Vitest)
+### Unit Tests (Vitest) — 35 tests passing
 
-Pure functions that are immediately testable without mocking:
-
-| Function | File | What to Test |
+| Test File | Functions Tested | Tests |
 |---|---|---|
-| `convexHull(points)` | `geometry.js` | Edge cases: <3 points, collinear, degenerate |
-| `expandHull(hull, pad)` | `geometry.js` | Expansion distance, empty hull |
-| `bfsPath(start, end)` | `pathfinding.js` | Connected, disconnected, same node, non-existent |
-| `getNeighborsAtDepth(id, depth)` | `pathfinding.js` | Depth 0/1/2/3, isolated node |
-| `wordSentiment(word)` | `tabs.js` | Positive, negative, neutral, unknown |
-| `computeBridgeScore(node)` | `tabs.js` | Hub node, isolated node, bridge node |
-| `computeClusteringCoeff()` | `tabs.js` | Requires graph setup |
-| `computeGraphDensity()` | `tabs.js` | Requires graph setup |
+| `tests/geometry.test.js` | `convexHull`, `expandHull` | 10 |
+| `tests/pathfinding.test.js` | `bfsPath`, `getNeighborsAtDepth` | 14 |
+| `tests/tabs-helpers.test.js` | `wordSentiment`, `computeBridgeScore`, `computeDegrees`, `computeGraphDensity`, `computeClusteringCoeff` | 11 |
+
+**Mock strategy:** Modules with side effects (`graph-data.js`) are mocked via `vi.mock()`. Use `vi.hoisted()` for shared mock state (pathfinding tests) or getter-based mocks (tabs-helpers tests) to work around `vi.mock` hoisting.
 
 ### E2E Tests (Playwright)
 
@@ -411,4 +414,4 @@ Pure functions that are immediately testable without mocking:
 - Inline `onclick` handlers in HTML strings reference `window` globals. These would be XSS vectors with untrusted data.
 - No Content Security Policy (CSP) in `index.html`.
 - No input sanitization anywhere.
-- Single devDependency (esbuild) — low supply chain risk.
+- Eight devDependencies (esbuild, eslint, prettier, typescript, vitest, etc.) — all well-maintained, none shipped to users.

@@ -266,15 +266,14 @@ There is no component abstraction. Renaming or removing any HTML element silentl
 
 ## 5. Maintainability Issues
 
-### 5.1 Zero Test Coverage [CRITICAL]
+### 5.1 ~~Zero Test Coverage~~ [RESOLVED]
 
-There are no tests of any kind:
-- No unit tests for pure functions (`convexHull`, `bfsPath`, `getNeighborsAtDepth`, `wordSentiment`, `computeClusteringCoeff`)
-- No integration tests for state transitions
-- No visual regression tests for canvas rendering
-- No smoke tests for tab builders
+Unit tests now exist for core pure functions (35 tests across 3 test files):
+- `tests/geometry.test.js` — 10 tests for `convexHull` and `expandHull`
+- `tests/pathfinding.test.js` — 14 tests for `bfsPath` and `getNeighborsAtDepth`
+- `tests/tabs-helpers.test.js` — 11 tests for `wordSentiment`, `computeBridgeScore`, `computeDegrees`, `computeGraphDensity`, `computeClusteringCoeff`
 
-This means any change risks silent regression.
+Remaining gaps: no integration tests, no visual regression tests, no E2E smoke tests.
 
 ### 5.2 ~~No Linting or Formatting~~ [RESOLVED]
 

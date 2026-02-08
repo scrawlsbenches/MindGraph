@@ -11,8 +11,10 @@
     "format": "prettier --write 'src/**/*.{js,ts,css}' build.js",
     "format:check": "prettier --check 'src/**/*.{js,ts,css}' build.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -23,10 +25,12 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.0.18",
     "esbuild": "^0.27.3",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   }
 }
