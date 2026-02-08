@@ -43,7 +43,6 @@ MindGraph/
 ├── ROADMAP.md                      # Phased recommendations & architecture vision
 ├── README.md                       # User-facing project documentation
 ├── index.html                      # Application shell (192 lines, element IDs used by JS)
-├── infranodus-ui-5.html            # DEAD FILE — original monolith, scheduled for deletion
 ├── build.js                        # esbuild config (CJS, bundles src/ → dist/)
 ├── package.json                    # 1 devDep: esbuild ^0.27.3
 ├── dist/                           # Build output (committed but should be .gitignored)
@@ -186,7 +185,7 @@ Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
 - **Cryptic variable names** — `_a`, `_d`, `_jx`, `_jy`, `psx`, `csy`, `gmw()`.
 
 ### LOW
-- **Dead file** — `infranodus-ui-5.html` (original monolith, 37K tokens).
+- ~~**Dead file** — `infranodus-ui-5.html`~~ [RESOLVED] Deleted.
 - **dist/ committed to git** — Should be in `.gitignore`.
 - **Edge dedup is O(n)** — `edges.find()` linear scan; should use a Set.
 - **BFS copies full path per queue entry** — O(V * path_length) memory.
@@ -339,7 +338,7 @@ Full details in `ROADMAP.md`. Current phase: **Phase 0 (Foundation)**.
 
 ### Immediate Next Actions (in order)
 
-1. Delete `infranodus-ui-5.html`
+1. ~~Delete `infranodus-ui-5.html`~~ Done.
 2. Add `dist/` to `.gitignore`
 3. Add ESLint + Prettier
 4. Add `tsconfig.json` with `allowJs` + `checkJs`

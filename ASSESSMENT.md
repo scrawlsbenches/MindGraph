@@ -20,7 +20,6 @@ MindGraph is a client-side network text analytics visualization tool. It renders
 ```
 MindGraph/                          (727 KB total)
 ├── index.html                      # Application shell (192 lines)
-├── infranodus-ui-5.html            # Original monolithic prototype (~37K tokens)
 ├── build.js                        # esbuild configuration (51 lines)
 ├── package.json                    # NPM config (1 dev dependency)
 ├── package-lock.json               # Lockfile

@@ -284,10 +284,9 @@ No ESLint configuration exists. Code style is inconsistent:
 - Mixed single-line and multi-line conditional patterns
 - No documented coding standards
 
-### 5.3 Dead/Legacy File [LOW]
-**File:** `infranodus-ui-5.html`
+### 5.3 ~~Dead/Legacy File~~ [RESOLVED]
 
-The original monolithic prototype (37K+ tokens) is still in the repository. It should be removed or moved to a `legacy/` directory. It adds confusion about which files are authoritative.
+`infranodus-ui-5.html` has been deleted.
 
 ### 5.4 No Error Boundaries [MEDIUM]
 
