@@ -23,6 +23,11 @@ test.describe('MindGraph Smoke Tests', () => {
 
     expect(errors).toEqual([]);
 
+    // Close AI chat panel so the graph is fully visible in the screenshot
+    await page.evaluate(() => {
+      document.getElementById('aiChat').style.display = 'none';
+    });
+
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, '01-page-load.png'), fullPage: true });
   });
 
