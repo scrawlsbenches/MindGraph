@@ -276,13 +276,9 @@ There are no tests of any kind:
 
 This means any change risks silent regression.
 
-### 5.2 No Linting or Formatting [HIGH]
+### 5.2 ~~No Linting or Formatting~~ [RESOLVED]
 
-No ESLint configuration exists. Code style is inconsistent:
-- Some functions use early returns, others use if/else chains
-- Inconsistent semicolon usage in multi-statement lines
-- Mixed single-line and multi-line conditional patterns
-- No documented coding standards
+ESLint (flat config + eslint-config-prettier), Prettier, and TypeScript `checkJs` are now configured. All source files pass lint and typecheck cleanly.
 
 ### 5.3 ~~Dead/Legacy File~~ [RESOLVED]
 
@@ -329,12 +325,12 @@ This makes styling inconsistent and impossible to override with CSS classes. Cre
 - Generates self-contained dist/
 
 ### 7.2 Concerns
-- **No source maps** — Debugging production builds is impossible
-- **No watch mode** — Developers must manually rebuild after every change
+- ~~**No source maps**~~ [RESOLVED] Source maps now generated for both JS and CSS.
+- ~~**No watch mode**~~ [RESOLVED] `npm run dev` uses esbuild context watch.
 - **No dev server** — Must use a separate tool (e.g., `npx serve`)
 - **CommonJS build script** — `build.js` uses `require()` while source uses ES modules. Inconsistency.
 - **No environment configuration** — No way to toggle debug mode, change data source, etc.
-- **dist/ committed to git** — Build artifacts should be in `.gitignore` and built in CI
+- ~~**dist/ committed to git**~~ [RESOLVED] Added to `.gitignore`, removed from tracking.
 
 ---
 

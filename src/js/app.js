@@ -43,15 +43,16 @@ document.getElementById('graphLegend').innerHTML =
 panelContent.innerHTML = buildTab0();
 
 // Mode toggle
-document.getElementById('modeToggle').onclick = function() {
+const modeToggle = /** @type {HTMLElement} */ (document.getElementById('modeToggle'));
+modeToggle.onclick = function() {
   this.classList.toggle('off');
 };
 
 // AI chat drag
-const aiChat = document.getElementById('aiChat');
+const aiChat = /** @type {HTMLElement} */ (document.getElementById('aiChat'));
 let chatDragging = false, chatDX, chatDY;
-aiChat.querySelector('.ai-chat-header').onmousedown = e => {
-  if (e.target.tagName === 'BUTTON') return;
+/** @type {HTMLElement} */ (aiChat.querySelector('.ai-chat-header')).onmousedown = e => {
+  if (/** @type {HTMLElement} */ (e.target).tagName === 'BUTTON') return;
   chatDragging = true;
   const r = aiChat.getBoundingClientRect();
   chatDX = e.clientX - r.left;

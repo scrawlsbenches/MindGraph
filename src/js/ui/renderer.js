@@ -5,7 +5,7 @@
 import { state } from '../core/state.js';
 import { CLUSTER_COLORS, FONT } from '../core/config.js';
 import { nodes, edges, neighbors } from '../core/graph-data.js';
-import { ctx, canvas } from '../core/camera.js';
+import { ctx } from '../core/camera.js';
 import { convexHull, expandHull, drawSmoothHull } from '../core/geometry.js';
 import { getNeighborsAtDepth } from '../core/pathfinding.js';
 
@@ -25,7 +25,7 @@ export function isHL(n) {
   return true;
 }
 
-function nodeDepthLevel(n) {
+function _nodeDepthLevel(n) {
   if (!state.depthMap) return 0;
   return state.depthMap.get(n.id) ?? -1;
 }

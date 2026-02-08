@@ -5,6 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "node build.js",
+    "dev": "node build.js --watch",
+    "lint": "eslint src/ build.js",
+    "lint:fix": "eslint src/ build.js --fix",
+    "format": "prettier --write 'src/**/*.{js,ts,css}' build.js",
+    "format:check": "prettier --check 'src/**/*.{js,ts,css}' build.js",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,6 +22,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "esbuild": "^0.27.3"
+    "@eslint/js": "^10.0.1",
+    "esbuild": "^0.27.3",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3"
   }
 }

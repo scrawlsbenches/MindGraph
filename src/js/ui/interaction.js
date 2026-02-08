@@ -79,7 +79,7 @@ canvas.addEventListener('mousemove', e => {
   }
 });
 
-canvas.addEventListener('mouseup', e => {
+canvas.addEventListener('mouseup', () => {
   if (dragNode && Date.now() - mdTime < 200) selectNode(dragNode);
   if (dragNode) state.labelVisCache = null;
   dragNode = null; isPanning = false;
@@ -141,13 +141,13 @@ export function setDepth(d) {
   state.selectionDepth = d;
   updateDepthMap();
   state.labelVisCache = null;
-  document.querySelectorAll('.nd-depth-btn').forEach(b =>
+  document.querySelectorAll('.nd-depth-btn').forEach((/** @type {HTMLElement} */ b) =>
     b.classList.toggle('active', +b.dataset.depth === d)
   );
   updateND();
 }
 
 // Depth button click handlers
-document.querySelectorAll('.nd-depth-btn').forEach(btn => {
+document.querySelectorAll('.nd-depth-btn').forEach((/** @type {HTMLElement} */ btn) => {
   btn.addEventListener('click', () => setDepth(+btn.dataset.depth));
 });

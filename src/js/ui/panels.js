@@ -37,7 +37,7 @@ export function updateND() {
     `<b>Direct:</b> ${directNb.size} connections \u00B7 ${diff.length} bridges` +
     (state.selectionDepth > 1 ? `<br><b>Depth ${state.selectionDepth}:</b> ${totalVisible} nodes visible` : '');
 
-  document.querySelectorAll('.nd-depth-btn').forEach(b =>
+  document.querySelectorAll('.nd-depth-btn').forEach((/** @type {HTMLElement} */ b) =>
     b.classList.toggle('active', +b.dataset.depth === state.selectionDepth)
   );
 
@@ -53,7 +53,7 @@ export function updateND() {
       }).join('')
     : '<span style="font-size:11px;color:var(--text-muted)">No cross-cluster bridges</span>';
 
-  nodeDetail.querySelectorAll('.nd-chip').forEach(c => {
+  nodeDetail.querySelectorAll('.nd-chip').forEach((/** @type {HTMLElement} */ c) => {
     c.onclick = () => { const t = nodes[+c.dataset.nid]; if (t) selectNode(t); };
   });
   updateStatus();
@@ -87,12 +87,14 @@ document.getElementById('pathClose').onclick = () => {
 };
 
 // Graph control buttons
-document.getElementById('btnHulls').onclick = function() {
+const btnHulls = /** @type {HTMLButtonElement} */ (document.getElementById('btnHulls'));
+btnHulls.onclick = function() {
   state.showHulls = !state.showHulls;
   this.classList.toggle('active', state.showHulls);
 };
 
-document.getElementById('btnPathMode').onclick = function() {
+const btnPathMode = /** @type {HTMLButtonElement} */ (document.getElementById('btnPathMode'));
+btnPathMode.onclick = function() {
   state.pathMode = !state.pathMode;
   this.classList.toggle('active', state.pathMode);
   if (!state.pathMode) {
@@ -102,7 +104,8 @@ document.getElementById('btnPathMode').onclick = function() {
   }
 };
 
-document.getElementById('btnMinimap').onclick = function() {
+const btnMinimap = /** @type {HTMLButtonElement} */ (document.getElementById('btnMinimap'));
+btnMinimap.onclick = function() {
   state.showMinimap = !state.showMinimap;
   this.classList.toggle('active', state.showMinimap);
   mmDiv.classList.toggle('hidden', !state.showMinimap);
@@ -125,13 +128,13 @@ document.getElementById('aiChatClose').onclick = () => {
 };
 
 // Tab switching
-let currentTab = 0;
+let _currentTab = 0;
 const tabBuilders = [buildTab0, buildTab1, buildTab2, buildTab3, buildTab4, buildTab5, buildTab6, buildTab7];
 
-document.querySelectorAll('.panel-tab').forEach(tab => {
+document.querySelectorAll('.panel-tab').forEach((/** @type {HTMLElement} */ tab) => {
   tab.addEventListener('click', function() {
-    const idx = +this.dataset.tab;
-    currentTab = idx;
+    const idx = +/** @type {HTMLElement} */ (this).dataset.tab;
+    _currentTab = idx;
     document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
     this.classList.add('active');
     panelContent.innerHTML = tabBuilders[idx]();

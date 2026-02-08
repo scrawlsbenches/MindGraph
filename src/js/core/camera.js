@@ -5,10 +5,10 @@
 import { FLY_DURATION } from './config.js';
 import { state } from './state.js';
 
-export const canvas = document.getElementById('graphCanvas');
-export const ctx = canvas.getContext('2d');
-export const graphArea = document.getElementById('graphArea');
-export const tooltip = document.getElementById('tooltip');
+export const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('graphCanvas'));
+export const ctx = /** @type {CanvasRenderingContext2D} */ (canvas.getContext('2d'));
+export const graphArea = /** @type {HTMLDivElement} */ (document.getElementById('graphArea'));
+export const tooltip = /** @type {HTMLDivElement} */ (document.getElementById('tooltip'));
 
 // Fly-to animation state (module-local)
 let flyTarget = null;

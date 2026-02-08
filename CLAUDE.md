@@ -10,7 +10,7 @@ It encodes project knowledge, architecture, known issues, conventions, and maint
 MindGraph is a client-side network text analytics visualization tool. It renders an interactive force-directed graph on Canvas 2D with cluster analysis, path finding, sentiment analysis, and 8 analytics dashboard tabs. Zero runtime dependencies. 66 KB production bundle.
 
 **Repository:** scrawlsbenches/MindGraph
-**License:** ISC (declared in package.json; LICENSE file needs to be created)
+**License:** ISC (see LICENSE file)
 **Node requirement:** >= 18
 
 ---
@@ -18,8 +18,15 @@ MindGraph is a client-side network text analytics visualization tool. It renders
 ## Quick Reference
 
 ```bash
-npm install          # Install dev dependencies (esbuild only)
+npm install          # Install dev dependencies
 npm run build        # Bundle src/ → dist/ (JS 42KB + CSS 24KB + HTML 8KB)
+npm run dev          # Watch mode (rebuilds on change, no minification)
+npm run lint         # ESLint (flat config, eslint-config-prettier)
+npm run lint:fix     # ESLint with auto-fix
+npm run format       # Prettier (write)
+npm run format:check # Prettier (check only)
+npm run typecheck    # TypeScript checkJs (no emit)
+npm run check        # lint + typecheck + build (full CI check)
 open index.html      # Run locally (loads dist/ bundles)
 ```
 
@@ -28,8 +35,6 @@ For development without rebuilding, edit `index.html` to load source directly:
 <link rel="stylesheet" href="src/css/bundle.css">
 <script type="module" src="src/js/app.js"></script>
 ```
-
-There are no test, lint, typecheck, or CI commands yet. See "Roadmap" section below.
 
 ---
 
@@ -42,13 +47,18 @@ MindGraph/
 ├── CODE_REVIEW.md                  # Detailed code review with severity ratings
 ├── ROADMAP.md                      # Phased recommendations & architecture vision
 ├── README.md                       # User-facing project documentation
+├── LICENSE                         # ISC license
 ├── index.html                      # Application shell (192 lines, element IDs used by JS)
 ├── build.js                        # esbuild config (CJS, bundles src/ → dist/)
-├── package.json                    # 1 devDep: esbuild ^0.27.3
-├── dist/                           # Build output (committed but should be .gitignored)
+├── package.json                    # Dev deps: esbuild, eslint, prettier, typescript
+├── eslint.config.js                # ESLint flat config (recommended + prettier)
+├── .prettierrc                     # Prettier config (single quotes, 2-space, semi)
+├── .editorconfig                   # Editor settings (indent, EOL, charset)
+├── tsconfig.json                   # TypeScript checkJs config (no emit)
+├── dist/                           # Build output (.gitignored)
 │   ├── index.html
-│   ├── mindgraph.min.js
-│   └── mindgraph.min.css
+│   ├── mindgraph.min.js            # + source map
+│   └── mindgraph.min.css           # + source map
 └── src/
     ├── js/                         # 1,747 lines across 14 files
     │   ├── app.js                  # Entry point, render loop, window globals (97 lines)
@@ -68,6 +78,9 @@ MindGraph/
     │   │   └── search.js           # Search input, cluster filter pills (60 lines)
     │   └── analytics/
     │       └── tabs.js             # 8 tab builder functions (433 lines)
+    ├── types/                      # TypeScript declarations
+    │   ├── global.d.ts             # Window augmentation for inline onclick globals
+    │   └── graph.d.ts              # GraphNode, GraphEdge, AppState interfaces
     └── css/                        # 1,433 lines across 10 files
         ├── bundle.css              # CSS entry point (@import all below)
         ├── variables.css           # Design tokens (--bg-primary, --text-secondary, etc.)
@@ -186,11 +199,11 @@ Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
 
 ### LOW
 - ~~**Dead file** — `infranodus-ui-5.html`~~ [RESOLVED] Deleted.
-- **dist/ committed to git** — Should be in `.gitignore`.
+- ~~**dist/ committed to git**~~ [RESOLVED] Added to `.gitignore`, removed from tracking.
 - **Edge dedup is O(n)** — `edges.find()` linear scan; should use a Set.
 - **BFS copies full path per queue entry** — O(V * path_length) memory.
 - **Naive sentiment** — Hardcoded word lists with linear search, recreated per call.
-- **Missing LICENSE file** — ISC declared in package.json but file doesn't exist.
+- ~~**Missing LICENSE file**~~ [RESOLVED] ISC LICENSE file created.
 
 ---
 
@@ -198,14 +211,16 @@ Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
 
 ### Code Style
 
-No linter or formatter is configured yet. Current observed patterns:
+Enforced by ESLint (flat config + eslint-config-prettier) and Prettier. Run `npm run lint` and `npm run format:check`.
 
 - **ES modules** — All source files use `import`/`export`. The build script (`build.js`) uses CJS `require()`.
-- **Semicolons** — Used, but some multi-statement lines chain with `;` on one line.
+- **Semicolons** — Always (Prettier enforced).
+- **Quotes** — Single quotes (Prettier enforced).
+- **Indentation** — 2 spaces (Prettier enforced).
+- **Print width** — 120 characters.
 - **Naming** — camelCase for functions/variables. UPPER_SNAKE for constants in `config.js`. Underscore prefix (`_a`, `_d`) for internal/transient node properties.
-- **Comments** — Module-level block headers (`/* === ... === */`). No JSDoc. No inline comments explaining logic.
-- **Indentation** — 2 spaces.
-- **Strings** — Template literals for HTML generation, single quotes elsewhere.
+- **Comments** — Module-level block headers (`/* === ... === */`). JSDoc `@type` casts for DOM elements. No inline comments explaining logic.
+- **Type checking** — `tsc --noEmit` with `checkJs`. Use `/** @type {Type} */` casts for DOM element narrowing. Type interfaces in `src/types/`.
 
 ### When Modifying Code
 
@@ -329,7 +344,7 @@ Full details in `ROADMAP.md`. Current phase: **Phase 0 (Foundation)**.
 
 | Phase | Focus | Status |
 |---|---|---|
-| 0 | ESLint, Prettier, tsconfig checkJs, remove dead files, .gitignore dist/ | Not started |
+| 0 | ESLint, Prettier, tsconfig checkJs, remove dead files, .gitignore dist/ | **Done** |
 | 1 | Vitest unit tests, GitHub Actions CI, Playwright smoke test | Not started |
 | 2 | TypeScript migration (core/ first, then ui/, then analytics/) | Not started |
 | 3 | Architecture fixes (events, extract data from tabs, seeded PRNG, decompose renderer) | Not started |
@@ -339,9 +354,9 @@ Full details in `ROADMAP.md`. Current phase: **Phase 0 (Foundation)**.
 ### Immediate Next Actions (in order)
 
 1. ~~Delete `infranodus-ui-5.html`~~ Done.
-2. Add `dist/` to `.gitignore`
-3. Add ESLint + Prettier
-4. Add `tsconfig.json` with `allowJs` + `checkJs`
+2. ~~Add `dist/` to `.gitignore`~~ Done.
+3. ~~Add ESLint + Prettier~~ Done.
+4. ~~Add `tsconfig.json` with `allowJs` + `checkJs`~~ Done.
 5. Add Vitest + first unit test (`convexHull`)
 6. Add seeded PRNG to `graph-data.js`
 7. Define TypeScript interfaces for Node, Edge, State

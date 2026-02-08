@@ -67,16 +67,16 @@ MindGraph/                          (727 KB total)
 
 | Layer | Technology | Notes |
 |---|---|---|
-| Language | JavaScript ES Modules | Vanilla, no TypeScript |
+| Language | JavaScript ES Modules | Vanilla, TypeScript `checkJs` enabled |
 | Rendering | Canvas 2D API | Custom physics engine |
 | Styling | CSS3 + Custom Properties | No preprocessor |
-| Build | esbuild 0.27.3 | IIFE bundle + minification |
+| Build | esbuild 0.27.3 | IIFE bundle + minification + source maps |
 | Package Manager | npm | Node >= 18 required |
 | Frameworks | None | Zero runtime dependencies |
 | Testing | None | No test framework configured |
-| Linting | None | No ESLint, Prettier, or similar |
+| Linting | ESLint 10 + Prettier 3 | Flat config, eslint-config-prettier |
 | CI/CD | None | No GitHub Actions or pipelines |
-| Type Checking | None | No JSDoc types or TypeScript |
+| Type Checking | TypeScript 5.9 (checkJs) | `tsc --noEmit`, type declarations in `src/types/` |
 
 ---
 
@@ -130,20 +130,22 @@ The application has no runtime dependencies. All functionality is implemented fr
 - Rendering (Canvas 2D API)
 - UI interactions (vanilla DOM events)
 
-### Dev Dependencies: **One**
+### Dev Dependencies: **Six**
 
 | Package | Version | Purpose |
 |---|---|---|
 | esbuild | ^0.27.3 | Bundle & minify JS/CSS |
+| eslint | ^10.0.0 | Linting |
+| @eslint/js | ^10.0.1 | ESLint recommended rules |
+| eslint-config-prettier | ^10.1.8 | Disable ESLint rules that conflict with Prettier |
+| prettier | ^3.8.1 | Code formatting |
+| typescript | ^5.9.3 | Type checking (checkJs, no emit) |
 
 ### Missing Dependencies (recommended)
 
 | Category | Suggested |
 |---|---|
-| Test framework | vitest or jest |
-| Linter | eslint |
-| Formatter | prettier |
-| Type checking | typescript (or JSDoc with `checkJs`) |
+| Test framework | vitest |
 | E2E testing | playwright |
 | Pre-commit hooks | husky + lint-staged |
 
@@ -227,14 +229,15 @@ The commit history is clean and logical, showing a deliberate refactoring from p
 
 | Metric | Value |
 |---|---|
-| Total source lines | 3,180 |
-| JavaScript lines | 1,747 |
+| Total source lines | ~3,200 |
+| JavaScript lines | ~1,750 |
 | CSS lines | 1,433 |
-| Source files | 24 |
+| Source files | 26 (14 JS + 10 CSS + 2 .d.ts) |
 | Runtime dependencies | 0 |
-| Dev dependencies | 1 |
+| Dev dependencies | 6 |
 | Test coverage | 0% |
-| Linting rules | None |
+| Linting rules | ESLint recommended + Prettier |
+| Type checking | TypeScript checkJs (0 errors) |
 | CI/CD pipelines | None |
 | Open issues | 0 |
 | Contributors | 1 |

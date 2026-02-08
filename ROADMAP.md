@@ -65,14 +65,14 @@ These are hygiene items that should be done before any feature work.
 
 | # | Item | Effort | Impact |
 |---|---|---|---|
-| 0.1 | Add `.editorconfig` and Prettier | 30 min | Consistent formatting across contributors |
-| 0.2 | Add ESLint with recommended config | 30 min | Catch bugs, enforce patterns |
-| 0.3 | Add `tsconfig.json` with `checkJs` | 30 min | Type checking without migration |
+| 0.1 | ~~Add `.editorconfig` and Prettier~~ | ~~30 min~~ | ~~Done~~ |
+| 0.2 | ~~Add ESLint with recommended config~~ | ~~30 min~~ | ~~Done~~ |
+| 0.3 | ~~Add `tsconfig.json` with `checkJs`~~ | ~~30 min~~ | ~~Done~~ |
 | 0.4 | ~~Remove `infranodus-ui-5.html`~~ | ~~5 min~~ | ~~Done~~ |
-| 0.5 | Add `dist/` to `.gitignore` | 5 min | Don't commit build artifacts |
-| 0.6 | Add LICENSE file (ISC) | 5 min | Legal compliance with package.json |
-| 0.7 | Add source maps to build | 10 min | Enable production debugging |
-| 0.8 | Add watch mode to build | 10 min | Developer experience |
+| 0.5 | ~~Add `dist/` to `.gitignore`~~ | ~~5 min~~ | ~~Done~~ |
+| 0.6 | ~~Add LICENSE file (ISC)~~ | ~~5 min~~ | ~~Done~~ |
+| 0.7 | ~~Add source maps to build~~ | ~~10 min~~ | ~~Done~~ |
+| 0.8 | ~~Add watch mode to build~~ | ~~10 min~~ | ~~Done~~ |
 
 ### Phase 1: Quality Gates
 

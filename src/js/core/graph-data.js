@@ -62,7 +62,7 @@ function addEdge(a, b, w) {
     for (let i = 0; i < words.length; i++) {
       const nc = 2 + Math.floor(Math.random() * 3);
       for (let c = 0; c < nc; c++) {
-        let j = Math.random() < 0.4
+        const j = Math.random() < 0.4
           ? Math.floor(Math.random() * 4)
           : Math.floor(Math.random() * words.length);
         if (j !== i) addEdge(base + i, base + j, 0.5 + Math.random() * 0.5);

@@ -5,10 +5,10 @@
 import { state } from '../core/state.js';
 import { nodes, edges } from '../core/graph-data.js';
 
-const mmCanvas = document.getElementById('minimapCanvas');
-const mmCtx = mmCanvas.getContext('2d');
-export const mmDiv = document.getElementById('minimap');
-const mmVP = document.getElementById('minimapViewport');
+const mmCanvas = /** @type {HTMLCanvasElement} */ (document.getElementById('minimapCanvas'));
+const mmCtx = /** @type {CanvasRenderingContext2D} */ (mmCanvas.getContext('2d'));
+export const mmDiv = /** @type {HTMLDivElement} */ (document.getElementById('minimap'));
+const mmVP = /** @type {HTMLDivElement} */ (document.getElementById('minimapViewport'));
 
 let mmTransform = null;
 
