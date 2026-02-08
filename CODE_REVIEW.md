@@ -1,0 +1,376 @@
+# MindGraph Code Review
+
+**Date:** 2026-02-08
+**Reviewed by:** Claude Code (automated review)
+**Scope:** All source files in `src/js/` and `src/css/`, `build.js`, `index.html`
+
+---
+
+## Severity Levels
+
+- **CRITICAL** — Bug or design flaw that will cause incorrect behavior or break the app
+- **HIGH** — Significant issue affecting maintainability, scalability, or reliability
+- **MEDIUM** — Code smell, weak pattern, or moderate risk
+- **LOW** — Minor improvement opportunity or style concern
+
+---
+
+## 1. Logic Issues
+
+### 1.1 Non-Deterministic Graph Layout [MEDIUM]
+**File:** `src/js/core/graph-data.js:21-26`, `src/js/core/graph-data.js:63-68`
+
+`Math.random()` is called during module initialization to generate node positions, edge connections, and weights. Every page reload produces a different graph topology and layout. This makes:
+- Bug reproduction impossible
+- Visual regression testing impossible
+- User experience inconsistent
+
+**Recommendation:** Use a seeded PRNG (e.g., `mulberry32`) initialized from a configurable seed.
+
+### 1.2 Physics Repulsion Limited to Adjacent Index Window [MEDIUM]
+**File:** `src/js/core/physics.js:32`
+
+```js
+for (let j = i + 1; j < Math.min(i + 20, NUM_NODES); j++) {
+```
+
+The label-footprint repulsion only checks the next 20 nodes by array index. Since nodes are ordered by cluster (0-19 = cluster 0, 20-39 = cluster 1, etc.), this means:
+- Nodes at the end of one cluster check nodes at the start of the next cluster
+- Nodes in cluster 4 (indices 80-99) only check up to index 99, missing many possible overlaps
+- Cross-cluster overlap detection depends entirely on array ordering, not spatial proximity
+
+This is a performance shortcut that works "well enough" for 100 nodes but is architecturally fragile.
+
+### 1.3 BFS Path Copies Full Path Array Per Queue Entry [MEDIUM]
+**File:** `src/js/core/pathfinding.js:17-20`
+
+```js
+queue.push([...path, nb]);
+```
+
+Each BFS step creates a full copy of the path. For a graph with 100 nodes this is fine, but for larger graphs this becomes O(V * path_length) memory. A parent-pointer map would be O(V).
+
+### 1.4 Edge Duplicate Check is O(n) Linear Scan [LOW]
+**File:** `src/js/core/graph-data.js:51`
+
+```js
+if (edges.find(e => e.key === k)) return;
+```
+
+Every `addEdge` call scans the entire edges array. A `Set` of keys would make this O(1).
+
+### 1.5 Hardcoded Cluster Count [MEDIUM]
+**File:** Multiple files
+
+The number `5` is hardcoded in at least 8 locations:
+- `physics.js:79` — `n.cluster / 5`
+- `renderer.js:51` — `for (let ci = 0; ci < 5; ci++)`
+- `tabs.js:19` — `Array.from({ length: 5 }, ...)`
+- `tabs.js:159-175` — matrix loops `for (let i = 0; i < 5; i++)`
+- `graph-data.js:52` — `n.cluster * 20`
+
+If clusters are ever added or removed, every one of these must be found and updated. Should derive from `CLUSTER_NAMES.length`.
+
+### 1.6 Convex Hulls Recomputed Every Frame [MEDIUM]
+**File:** `src/js/ui/renderer.js:111-124`
+
+`computeHulls()` is called inside `draw()`, which runs at 60fps. It filters all nodes, computes convex hulls, and expands them every single frame. Since node positions change gradually, hulls could be cached and recomputed every N frames or on significant movement.
+
+---
+
+## 2. Poor / Weak Code
+
+### 2.1 Massive HTML String Concatenation in tabs.js [HIGH]
+**File:** `src/js/analytics/tabs.js` (entire file, 433 lines)
+
+All 8 tab builder functions construct HTML through string concatenation with inline `onclick` handlers referencing `window` globals:
+
+```js
+onclick="selectNode(nodes[${n.id}]);updateND()"
+onclick="searchInput.value='${k}';searchInput.dispatchEvent(new Event('input'))"
+onclick="toggleCluster(${s.ci})"
+```
+
+Issues:
+1. **XSS surface** — If any node word contained `'` or `"` or `<script>`, the inline handler would break or execute arbitrary code. Currently safe only because data is hardcoded.
+2. **Untestable** — Functions return HTML strings, not DOM elements. No way to unit test behavior.
+3. **Fragile coupling** — Relies on `window.selectNode`, `window.nodes`, `window.searchInput` being defined. No compile-time or runtime validation.
+4. **Unmaintainable** — 433 lines of template literals mixed with business logic.
+
+### 2.2 Window Global Dispatch Pattern [HIGH]
+**File:** `src/js/app.js:18-27`
+
+```js
+window.selectNode = selectNode;
+window.updateND = updateND;
+window.toggleCluster = toggleCluster;
+window.nodes = nodes;
+window.searchInput = searchInput;
+```
+
+Functions and data are put on `window` so that `onclick="..."` strings in dynamically generated HTML can call them. This:
+- Defeats the purpose of ES modules
+- Creates implicit global dependencies
+- Makes refactoring dangerous (rename a function = broken HTML strings)
+- Prevents tree-shaking
+- Pollutes the global namespace
+
+### 2.3 Cryptic Variable Names [MEDIUM]
+**File:** `src/js/core/graph-data.js:23-26`
+
+```js
+_a: (ci / 5) * Math.PI * 2 + (Math.random() - 0.5) * 1.0,
+_d: 0.12 + Math.random() * 0.28,
+_jx: (Math.random() - 0.5) * 0.12,
+_jy: (Math.random() - 0.5) * 0.12,
+```
+
+Properties `_a`, `_d`, `_jx`, `_jy` are used for initial position calculation in `physics.js:108-109` but their meaning is unclear. They represent:
+- `_a` = angle (radians)
+- `_d` = distance factor
+- `_jx`, `_jy` = jitter
+
+Similarly in `interaction.js:13`:
+```js
+let dragNode = null, isPanning = false, psx = 0, psy = 0, csx = 0, csy = 0, mdTime = 0;
+```
+
+`psx/psy` = pan start x/y, `csx/csy` = camera start x/y, `mdTime` = mousedown time. These should be named descriptively.
+
+### 2.4 Function Name `gmw` is Opaque [LOW]
+**File:** `src/js/ui/interaction.js:15`
+
+```js
+function gmw(e) {
+```
+
+This stands for "get mouse world [coordinates]" but reads as gibberish. Should be `getMouseWorldCoords` or `screenToWorld`.
+
+### 2.5 Magic Numbers Throughout Physics [MEDIUM]
+**File:** `src/js/core/physics.js`
+
+The physics simulation contains dozens of tuning constants with no documentation:
+- `0.0003` — spring force multiplier (line 19)
+- `65` / `120` — ideal edge lengths (line 18)
+- `0.14` / `0.10` — repulsion strengths (lines 44, 66)
+- `0.00002` / `0.00006` — gravity multipliers (lines 77, 80)
+- `0.04` — random jitter (lines 95-96)
+- `0.90` — velocity damping (line 97)
+- `30` — boundary margin (lines 99-100)
+
+These should be named constants in `config.js` with explanatory comments.
+
+### 2.6 Sentiment Analysis is Naive [LOW]
+**File:** `src/js/analytics/tabs.js:56-64`
+
+```js
+function wordSentiment(word) {
+  const positive = ['nice', 'bright', ...];
+  const negative = ['strange', 'odd', ...];
+  if (positive.includes(word)) return 1;
+  if (negative.includes(word)) return -1;
+  return 0;
+}
+```
+
+Hardcoded word lists with linear search. Creates new arrays on every call. Classification is questionable (e.g., "mirror" and "wall" classified as negative; "surprise" classified as positive). The lists should be `Set` objects defined once at module scope.
+
+---
+
+## 3. Design Flaws
+
+### 3.1 No Separation Between Data and Presentation [HIGH]
+
+The analytics tab builders (`tabs.js`) mix:
+- Data computation (degree calculation, bridge scoring, clustering coefficient)
+- HTML generation (template strings with inline styles)
+- Event binding (inline `onclick` handlers)
+
+This makes it impossible to:
+- Test data computations independently
+- Render in a different format (e.g., export to JSON/CSV)
+- Reuse computations across tabs (several tabs recompute the same metrics)
+
+### 3.2 Module-Level Side Effects [MEDIUM]
+**File:** `src/js/core/graph-data.js:12-44`, `src/js/core/graph-data.js:59-85`
+
+Graph data is generated by IIFEs that execute on `import`. This means:
+- Importing the module for testing immediately generates all graph data
+- The module cannot be initialized with different data
+- No way to reset the graph without reloading the page
+
+### 3.3 Circular Dependency Risk [MEDIUM]
+**Files:** `ui/interaction.js` imports from `ui/panels.js`, and `ui/panels.js` imports from `ui/interaction.js`
+
+```
+interaction.js → panels.js (updateND, updatePathBanner)
+panels.js → interaction.js (selectNode)
+```
+
+This circular dependency currently works because ES modules resolve bindings lazily, but it's a maintenance trap. If either module tries to use the other's export during initialization (not just in function bodies), it will get `undefined`.
+
+### 3.4 Renderer Does Too Much [HIGH]
+**File:** `src/js/ui/renderer.js` (297 lines)
+
+The `draw()` function handles:
+- Hull computation
+- Edge rendering (with 4 different visual modes)
+- Path particle updates and rendering
+- Node rendering (with glow, selection rings, depth indicators)
+- Label collision detection and caching
+- Label rendering
+- Zoom badge UI
+
+This is a single 186-line function (lines 101-296) that should be decomposed into focused rendering passes.
+
+---
+
+## 4. Architectural Issues
+
+### 4.1 No Data Layer Abstraction [HIGH]
+
+The graph data is generated at module load time and stored in module-scope arrays. There is no abstraction for:
+- Loading data from an external source
+- Serializing/deserializing graph state
+- Undo/redo
+- Multiple graph instances
+- Data validation
+
+If the project needs to load real text analytics data (its stated purpose), the entire data layer must be rewritten.
+
+### 4.2 Single Canvas, Single Thread [MEDIUM]
+
+All rendering happens on a single Canvas 2D context in the main thread. The physics simulation also runs in the main thread inside `requestAnimationFrame`. For larger graphs (500+ nodes), this will cause frame drops. Solutions:
+- OffscreenCanvas in a Web Worker for physics
+- WebGL for rendering (via a library like Pixi.js or raw WebGL)
+- Separate canvas layers for static vs. dynamic content
+
+### 4.3 No Event System [MEDIUM]
+
+State changes propagate through direct mutation + render loop polling. There's no event/pub-sub system, which means:
+- No way to react to specific state changes
+- UI updates require manual calls (e.g., `updateND()`, `updateStatus()`)
+- Easy to forget updating dependent UI when state changes
+- No audit trail of state changes
+
+### 4.4 Tight HTML/JS Coupling [HIGH]
+
+The `index.html` defines specific element IDs that JavaScript modules reference directly:
+- `graphCanvas`, `graphArea`, `tooltip`, `nodeDetail`, `ndDot`, `ndWord`, etc.
+- `btnZoomIn`, `btnZoomOut`, `btnFit`, `btnUnpin`, `btnHulls`, `btnPathMode`, `btnMinimap`
+- `panelContent`, `panelTabs`, `searchInput`, `searchClear`, `searchBox`
+
+There is no component abstraction. Renaming or removing any HTML element silently breaks JavaScript functionality with no compile-time or runtime error handling.
+
+---
+
+## 5. Maintainability Issues
+
+### 5.1 Zero Test Coverage [CRITICAL]
+
+There are no tests of any kind:
+- No unit tests for pure functions (`convexHull`, `bfsPath`, `getNeighborsAtDepth`, `wordSentiment`, `computeClusteringCoeff`)
+- No integration tests for state transitions
+- No visual regression tests for canvas rendering
+- No smoke tests for tab builders
+
+This means any change risks silent regression.
+
+### 5.2 No Linting or Formatting [HIGH]
+
+No ESLint configuration exists. Code style is inconsistent:
+- Some functions use early returns, others use if/else chains
+- Inconsistent semicolon usage in multi-statement lines
+- Mixed single-line and multi-line conditional patterns
+- No documented coding standards
+
+### 5.3 Dead/Legacy File [LOW]
+**File:** `infranodus-ui-5.html`
+
+The original monolithic prototype (37K+ tokens) is still in the repository. It should be removed or moved to a `legacy/` directory. It adds confusion about which files are authoritative.
+
+### 5.4 No Error Boundaries [MEDIUM]
+
+There are zero `try/catch` blocks in the entire codebase. If any Canvas API call fails, any DOM element is missing, or any data is malformed, the entire app crashes silently. The render loop (`requestAnimationFrame`) would stop with no user feedback.
+
+### 5.5 Inline Styles in Generated HTML [MEDIUM]
+**File:** `src/js/analytics/tabs.js`
+
+Tab builders use extensive inline styles:
+```js
+style="font-size:11px;font-weight:700;color:${CLUSTER_COLORS[cs.ci]};margin-bottom:4px"
+style="display:flex;flex-wrap:wrap;gap:3px"
+```
+
+This makes styling inconsistent and impossible to override with CSS classes. Creates duplication (the same style strings appear in multiple tab builders).
+
+---
+
+## 6. CSS Review
+
+### 6.1 Strengths
+- Well-organized CSS custom properties in `variables.css`
+- Component-based file organization (topbar, toolbar, sidebar, etc.)
+- Consistent use of design tokens (`--bg-primary`, `--text-secondary`, etc.)
+- Responsive-aware with `min-width` on analytics content
+
+### 6.2 Concerns
+- **No responsive breakpoints** — The layout assumes a wide desktop viewport. There are no `@media` queries for tablet or mobile.
+- **Hardcoded dark theme only** — Variables define a single dark color scheme with no light theme support.
+- **No CSS reset normalization** — `base.css` has minimal resets (`margin: 0`, `box-sizing`) but no comprehensive normalization.
+- **z-index management** — Multiple components use arbitrary z-index values (tooltip: inferred from DOM order, chat panel: none declared). No z-index scale defined.
+
+---
+
+## 7. Build System Review
+
+### 7.1 Strengths
+- Simple, fast build with esbuild
+- Reports bundle sizes
+- Generates self-contained dist/
+
+### 7.2 Concerns
+- **No source maps** — Debugging production builds is impossible
+- **No watch mode** — Developers must manually rebuild after every change
+- **No dev server** — Must use a separate tool (e.g., `npx serve`)
+- **CommonJS build script** — `build.js` uses `require()` while source uses ES modules. Inconsistency.
+- **No environment configuration** — No way to toggle debug mode, change data source, etc.
+- **dist/ committed to git** — Build artifacts should be in `.gitignore` and built in CI
+
+---
+
+## 8. File-by-File Findings Summary
+
+| File | Lines | Issues Found |
+|---|---|---|
+| `core/state.js` | 35 | No type documentation, no validation |
+| `core/config.js` | 43 | Clean. Could export cluster count constant |
+| `core/graph-data.js` | 90 | IIFE side effects, linear edge search, random without seed |
+| `core/physics.js` | 113 | Magic numbers, limited repulsion window |
+| `core/camera.js` | 50 | Direct DOM access in core layer |
+| `core/geometry.js` | 62 | Clean. Good algorithm implementation |
+| `core/pathfinding.js` | 46 | Path copying in BFS, otherwise clean |
+| `ui/renderer.js` | 297 | God function, hulls recomputed per frame |
+| `ui/interaction.js` | 154 | Cryptic names, circular dep with panels |
+| `ui/panels.js` | 148 | Circular dep with interaction, innerHTML |
+| `ui/search.js` | 60 | Clean. Could debounce search input |
+| `ui/minimap.js` | 101 | Canvas reinitialized every draw call |
+| `analytics/tabs.js` | 433 | Massive HTML strings, XSS surface, mixed concerns |
+| `app.js` | 97 | Window globals, otherwise clean orchestration |
+| `build.js` | 51 | CJS in ESM project, no source maps |
+| `index.html` | 192 | No CSP, hardcoded element IDs |
+
+---
+
+## 9. Positive Findings
+
+These aspects of the codebase are done well:
+
+1. **Zero runtime dependencies** — Impressive for the functionality delivered. Small attack surface, fast loads.
+2. **Clean module boundaries** — Core/UI/Analytics separation is logical and mostly respected.
+3. **Efficient Canvas rendering** — Label collision caching, alpha-based visibility, selective minimap updates.
+4. **Correct algorithms** — Graham scan, BFS, Catmull-Rom splines are implemented correctly.
+5. **CSS organization** — Design tokens, component files, consistent naming.
+6. **Small bundle size** — 42 KB JS + 24 KB CSS is excellent for the feature set.
+7. **Readable code** — Despite some cryptic names, the overall code flow is straightforward.
+8. **Clean git history** — Logical progression from prototype to structured project.
