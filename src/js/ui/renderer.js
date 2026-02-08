@@ -3,6 +3,7 @@
    ============================================ */
 
 import { state } from '../core/state.js';
+import { random } from '../core/config.js';
 import { CLUSTER_COLORS, FONT } from '../core/config.js';
 import { nodes, edges, neighbors } from '../core/graph-data.js';
 import { ctx } from '../core/camera.js';
@@ -61,8 +62,8 @@ function computeHulls() {
 // Path particles
 function updatePathParticles() {
   if (!state.pathResult || state.pathResult.length < 2) { state.pathParticles = []; return; }
-  if (Math.random() < 0.15) {
-    state.pathParticles.push({ t: 0, speed: 0.003 + Math.random() * 0.004 });
+  if (random() < 0.15) {
+    state.pathParticles.push({ t: 0, speed: 0.003 + random() * 0.004 });
   }
   state.pathParticles.forEach(p => p.t += p.speed);
   state.pathParticles = state.pathParticles.filter(p => p.t <= 1);

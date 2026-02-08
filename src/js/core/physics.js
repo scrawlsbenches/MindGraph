@@ -3,6 +3,7 @@
    ============================================ */
 
 import { state } from './state.js';
+import { random } from './config.js';
 import { nodes, edges, NUM_NODES } from './graph-data.js';
 
 export function simulate() {
@@ -92,8 +93,8 @@ export function simulate() {
     }
 
     n.vx += gx; n.vy += gy;
-    n.vx += (Math.random() - 0.5) * 0.04;
-    n.vy += (Math.random() - 0.5) * 0.04;
+    n.vx += (random() - 0.5) * 0.04;
+    n.vy += (random() - 0.5) * 0.04;
     n.vx *= 0.90; n.vy *= 0.90;
     n.x += n.vx; n.y += n.vy;
     n.x = Math.max(30, Math.min(state.W - 30, n.x));

@@ -40,3 +40,15 @@ export const CROSS_CLUSTER_BRIDGES = [
 
 export const FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 export const FLY_DURATION = 400;
+
+// Seeded PRNG (mulberry32) for deterministic layouts
+const SEED = 42;
+let _rngState = SEED;
+
+export function random() {
+  _rngState |= 0;
+  _rngState = (_rngState + 0x6d2b79f5) | 0;
+  let t = Math.imul(_rngState ^ (_rngState >>> 15), 1 | _rngState);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}

@@ -17,15 +17,9 @@
 
 ## 1. Logic Issues
 
-### 1.1 Non-Deterministic Graph Layout [MEDIUM]
-**File:** `src/js/core/graph-data.js:21-26`, `src/js/core/graph-data.js:63-68`
+### ~~1.1 Non-Deterministic Graph Layout~~ [RESOLVED]
 
-`Math.random()` is called during module initialization to generate node positions, edge connections, and weights. Every page reload produces a different graph topology and layout. This makes:
-- Bug reproduction impossible
-- Visual regression testing impossible
-- User experience inconsistent
-
-**Recommendation:** Use a seeded PRNG (e.g., `mulberry32`) initialized from a configurable seed.
+All `Math.random()` calls replaced with a seeded PRNG (mulberry32, seed=42) exported from `config.js`. Graph topology and layout are now fully deterministic across reloads.
 
 ### 1.2 Physics Repulsion Limited to Adjacent Index Window [MEDIUM]
 **File:** `src/js/core/physics.js:32`

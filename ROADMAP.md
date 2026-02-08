@@ -81,9 +81,9 @@ These are hygiene items that should be done before any feature work.
 | 1.1 | ~~Add Vitest + unit tests for `core/geometry.js`~~ | ~~1 session~~ | ~~Done — 10 tests~~ |
 | 1.2 | ~~Add unit tests for `core/pathfinding.js`~~ | ~~1 session~~ | ~~Done — 14 tests~~ |
 | 1.3 | ~~Add unit tests for `analytics/tabs.js` helpers~~ | ~~1 session~~ | ~~Done — 11 tests~~ |
-| 1.4 | Add GitHub Actions CI pipeline | 1 session | Automated build + lint + test on PR |
-| 1.5 | Add Husky pre-commit hooks | 30 min | Prevent bad commits |
-| 1.6 | Add Playwright smoke test | 1 session | Page load + basic interaction |
+| 1.4 | ~~Add GitHub Actions CI pipeline~~ | ~~Skipped~~ | ~~Single developer, not needed~~ |
+| 1.5 | ~~Add Husky pre-commit hooks~~ | ~~Skipped~~ | ~~Single developer, not needed~~ |
+| 1.6 | ~~Add Playwright smoke test~~ | ~~1 session~~ | ~~Done — 8 tests with screenshots~~ |
 
 ### Phase 2: TypeScript Migration
 
@@ -101,7 +101,7 @@ These are hygiene items that should be done before any feature work.
 |---|---|---|---|
 | 3.1 | Replace `window` globals with event delegation | 1 session | Remove global namespace pollution |
 | 3.2 | Extract data computation from `tabs.js` HTML | 2 sessions | Testable analytics, reusable metrics |
-| 3.3 | Add seeded PRNG for deterministic layouts | 1 session | Reproducible graphs |
+| 3.3 | ~~Add seeded PRNG for deterministic layouts~~ | ~~Done~~ | ~~Reproducible graphs (mulberry32, seed=42)~~ |
 | 3.4 | Extract physics constants to config | 30 min | Tunable simulation |
 | 3.5 | Decompose `renderer.js draw()` into passes | 1 session | Maintainable rendering |
 | 3.6 | Break circular dependency (interaction ↔ panels) | 1 session | Cleaner module graph |

@@ -14,7 +14,8 @@
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "TMPDIR=$PWD/.tmp PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npx playwright test"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.56.0",
     "@vitest/coverage-v8": "^4.0.18",
     "esbuild": "^0.27.3",
     "eslint": "^10.0.0",

@@ -30,6 +30,7 @@ npm run check        # lint + typecheck + test + build (full CI check)
 npm run test         # Vitest unit tests (35 tests)
 npm run test:watch   # Vitest watch mode
 npm run test:coverage # Vitest with coverage
+npm run test:e2e     # Playwright E2E smoke tests (8 tests, captures screenshots)
 open index.html      # Run locally (loads dist/ bundles)
 ```
 
@@ -53,15 +54,21 @@ MindGraph/
 ├── LICENSE                         # ISC license
 ├── index.html                      # Application shell (192 lines, element IDs used by JS)
 ├── build.js                        # esbuild config (CJS, bundles src/ → dist/)
-├── package.json                    # Dev deps: esbuild, eslint, prettier, typescript, vitest
+├── package.json                    # Dev deps: esbuild, eslint, prettier, typescript, vitest, playwright
+├── vitest.config.js                # Vitest config (excludes e2e tests)
+├── playwright.config.js            # Playwright E2E config (chromium, webServer)
 ├── eslint.config.js                # ESLint flat config (recommended + prettier)
 ├── .prettierrc                     # Prettier config (single quotes, 2-space, semi)
 ├── .editorconfig                   # Editor settings (indent, EOL, charset)
 ├── tsconfig.json                   # TypeScript checkJs config (no emit)
-├── tests/                          # Unit tests (Vitest, 35 tests)
+├── tests/                          # All tests
 │   ├── geometry.test.js            # convexHull, expandHull (10 tests)
 │   ├── pathfinding.test.js         # bfsPath, getNeighborsAtDepth (14 tests)
-│   └── tabs-helpers.test.js        # wordSentiment, bridgeScore, degrees, density, clustering (11 tests)
+│   ├── tabs-helpers.test.js        # wordSentiment, bridgeScore, degrees, density, clustering (11 tests)
+│   ├── serve.js                    # Static file server for E2E tests
+│   └── e2e/                        # Playwright E2E smoke tests
+│       ├── smoke.spec.mjs          # 8 smoke tests with screenshots
+│       └── screenshots/            # Captured screenshots (.gitignored)
 ├── dist/                           # Build output (.gitignored)
 │   ├── index.html
 │   ├── mindgraph.min.js            # + source map
@@ -194,7 +201,7 @@ Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
 - **Tight HTML/JS coupling** — JS references 20+ element IDs from `index.html` with no validation.
 
 ### MEDIUM
-- **Non-deterministic layout** — `Math.random()` without seed makes layouts unreproducible.
+- ~~**Non-deterministic layout**~~ [RESOLVED] Seeded PRNG (mulberry32, seed=42) replaces all `Math.random()` calls.
 - **Hardcoded cluster count (5)** — Appears in 8+ locations across physics, renderer, tabs, graph-data.
 - **Convex hulls recomputed every frame** — `computeHulls()` called at 60fps inside `draw()`.
 - **Physics magic numbers** — 12+ tuning constants undocumented in `physics.js`.
@@ -352,7 +359,7 @@ Full details in `ROADMAP.md`. Current phase: **Phase 1 (Quality Gates)**.
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | ESLint, Prettier, tsconfig checkJs, remove dead files, .gitignore dist/ | **Done** |
-| 1 | Vitest unit tests, GitHub Actions CI, Playwright smoke test | **In progress** (unit tests done, CI + Playwright remaining) |
+| 1 | Vitest unit tests, Playwright smoke test | **Done** (35 unit tests + 8 E2E tests) |
 | 2 | TypeScript migration (core/ first, then ui/, then analytics/) | Not started |
 | 3 | Architecture fixes (events, extract data from tabs, seeded PRNG, decompose renderer) | Not started |
 | 4 | Features (data import/export, persistence, real AI chat, responsive, a11y) | Not started |
@@ -365,8 +372,7 @@ Full details in `ROADMAP.md`. Current phase: **Phase 1 (Quality Gates)**.
 3. ~~Add ESLint + Prettier~~ Done.
 4. ~~Add `tsconfig.json` with `allowJs` + `checkJs`~~ Done.
 5. ~~Add Vitest + unit tests (geometry, pathfinding, analytics helpers)~~ Done.
-6. Add GitHub Actions CI pipeline
-7. Add seeded PRNG to `graph-data.js`
+6. ~~Add seeded PRNG to `graph-data.js`~~ Done.
 7. Define TypeScript interfaces for Node, Edge, State
 8. Migrate `core/state.ts` as first TypeScript file
 
@@ -384,7 +390,22 @@ Full details in `ROADMAP.md`. Current phase: **Phase 1 (Quality Gates)**.
 
 **Mock strategy:** Modules with side effects (`graph-data.js`) are mocked via `vi.mock()`. Use `vi.hoisted()` for shared mock state (pathfinding tests) or getter-based mocks (tabs-helpers tests) to work around `vi.mock` hoisting.
 
-### E2E Tests (Playwright)
+### E2E Tests (Playwright) — 8 smoke tests passing
+
+| Test | What It Verifies | Screenshot |
+|---|---|---|
+| Page loads without errors | No JS crashes, canvas renders | `01-page-load.png` |
+| Canvas exists and has dimensions | Canvas visible, width/height > 100 | — |
+| 100 nodes in memory | `window.nodes.length === 100` | — |
+| Click canvas selects node | AI chat closed, canvas clickable | `02-canvas-click.png` |
+| Programmatic node selection | `selectNode(nodes[0])` opens detail panel | `03-node-detail.png` |
+| Search filters nodes | Status bar shows `Search: "dream"` | `04-search-filter.png` |
+| Analytics tabs render | All 8 tabs produce content | `05-analytics-tabs.png` |
+| Path mode toggles | Button active/inactive state toggles | — |
+
+**Screenshots** saved to `tests/e2e/screenshots/` (gitignored). Layout is deterministic (seeded PRNG) so screenshots are reproducible.
+
+**Server:** `tests/serve.js` — minimal Node.js static server, started automatically by Playwright's `webServer` config.
 
 | Test | What It Verifies |
 |---|---|

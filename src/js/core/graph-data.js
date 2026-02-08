@@ -2,7 +2,7 @@
    MindGraph — Graph Data (Nodes & Edges)
    ============================================ */
 
-import { CLUSTER_KEYWORDS, CLUSTER_COLORS, CROSS_CLUSTER_BRIDGES } from './config.js';
+import { CLUSTER_KEYWORDS, CLUSTER_COLORS, CROSS_CLUSTER_BRIDGES, random } from './config.js';
 
 export const nodes = [];
 export const edges = [];
@@ -18,12 +18,12 @@ export const adj = new Map();
         word,
         cluster: ci,
         color: CLUSTER_COLORS[ci],
-        r: wi < 4 ? 8 + Math.random() * 5 : 2.5 + Math.random() * 5,
+        r: wi < 4 ? 8 + random() * 5 : 2.5 + random() * 5,
         x: 0, y: 0, vx: 0, vy: 0,
-        _a: (ci / 5) * Math.PI * 2 + (Math.random() - 0.5) * 1.0,
-        _d: 0.12 + Math.random() * 0.28,
-        _jx: (Math.random() - 0.5) * 0.12,
-        _jy: (Math.random() - 0.5) * 0.12,
+        _a: (ci / 5) * Math.PI * 2 + (random() - 0.5) * 1.0,
+        _d: 0.12 + random() * 0.28,
+        _jx: (random() - 0.5) * 0.12,
+        _jy: (random() - 0.5) * 0.12,
         pinned: false,
         matchesSearch: true,
         visible: true,
@@ -60,17 +60,17 @@ function addEdge(a, b, w) {
   CLUSTER_KEYWORDS.forEach((words, ci) => {
     const base = ci * 20;
     for (let i = 0; i < words.length; i++) {
-      const nc = 2 + Math.floor(Math.random() * 3);
+      const nc = 2 + Math.floor(random() * 3);
       for (let c = 0; c < nc; c++) {
-        const j = Math.random() < 0.4
-          ? Math.floor(Math.random() * 4)
-          : Math.floor(Math.random() * words.length);
-        if (j !== i) addEdge(base + i, base + j, 0.5 + Math.random() * 0.5);
+        const j = random() < 0.4
+          ? Math.floor(random() * 4)
+          : Math.floor(random() * words.length);
+        if (j !== i) addEdge(base + i, base + j, 0.5 + random() * 0.5);
       }
     }
     for (let i = 0; i < 4; i++) {
       for (let j = i + 1; j < 4; j++) {
-        addEdge(base + i, base + j, 0.8 + Math.random() * 0.2);
+        addEdge(base + i, base + j, 0.8 + random() * 0.2);
       }
     }
   });
@@ -80,7 +80,7 @@ function addEdge(a, b, w) {
   CROSS_CLUSTER_BRIDGES.forEach(([c1, c2, w1, w2]) => {
     const n1 = nodes.find(n => n.cluster === c1 && n.word === w1);
     const n2 = nodes.find(n => n.cluster === c2 && n.word === w2);
-    if (n1 && n2) addEdge(n1.id, n2.id, 0.3 + Math.random() * 0.3);
+    if (n1 && n2) addEdge(n1.id, n2.id, 0.3 + random() * 0.3);
   });
 })();
 
