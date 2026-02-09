@@ -25,10 +25,16 @@ export function resize() {
   ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 }
 
+/**
+ * @param {number} sx
+ * @param {number} sy
+ * @returns {{ x: number, y: number }}
+ */
 export function s2w(sx, sy) {
   return { x: (sx - state.camX) / state.camZoom, y: (sy - state.camY) / state.camZoom };
 }
 
+/** @param {import('../../types/graph').GraphNode} n */
 export function flyToNode(n) {
   flyStartCam = { x: state.camX, y: state.camY, z: state.camZoom };
   const targetZoom = Math.max(state.camZoom, 1.5);

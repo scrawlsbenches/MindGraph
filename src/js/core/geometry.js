@@ -10,16 +10,14 @@ export function convexHull(points) {
 
   const lower = [];
   for (const p of pts) {
-    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0)
-      lower.pop();
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
     lower.push(p);
   }
 
   const upper = [];
   for (let i = pts.length - 1; i >= 0; i--) {
     const p = pts[i];
-    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0)
-      upper.pop();
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
     upper.push(p);
   }
 
@@ -32,10 +30,11 @@ export function convexHull(points) {
 export function expandHull(hull, pad) {
   const cx = hull.reduce((s, p) => s + p.x, 0) / hull.length;
   const cy = hull.reduce((s, p) => s + p.y, 0) / hull.length;
-  return hull.map(p => {
-    const dx = p.x - cx, dy = p.y - cy;
+  return hull.map((p) => {
+    const dx = p.x - cx,
+      dy = p.y - cy;
     const d = Math.sqrt(dx * dx + dy * dy) || 1;
-    return { x: p.x + dx / d * pad, y: p.y + dy / d * pad };
+    return { x: p.x + (dx / d) * pad, y: p.y + (dy / d) * pad };
   });
 }
 

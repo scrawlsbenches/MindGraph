@@ -70,11 +70,26 @@
   opacity: 0.35;
 }
 
-.filter-pill[data-cluster="0"] { background: var(--cluster-0); color: #000; }
-.filter-pill[data-cluster="1"] { background: var(--cluster-1); color: #000; }
-.filter-pill[data-cluster="2"] { background: var(--cluster-2); color: #000; }
-.filter-pill[data-cluster="3"] { background: var(--cluster-3); color: #fff; }
-.filter-pill[data-cluster="4"] { background: var(--cluster-4); color: #fff; }
+.filter-pill[data-cluster='0'] {
+  background: var(--cluster-0);
+  color: #000;
+}
+.filter-pill[data-cluster='1'] {
+  background: var(--cluster-1);
+  color: #000;
+}
+.filter-pill[data-cluster='2'] {
+  background: var(--cluster-2);
+  color: #000;
+}
+.filter-pill[data-cluster='3'] {
+  background: var(--cluster-3);
+  color: #fff;
+}
+.filter-pill[data-cluster='4'] {
+  background: var(--cluster-4);
+  color: #fff;
+}
 
 .hidden-nodes-label {
   font-size: 10px;

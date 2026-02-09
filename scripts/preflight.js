@@ -138,6 +138,7 @@ try {
 
 /* Summary */
 heading('--- Summary ---');
+console.log(`  Branch: ${currentBranch || '(detached HEAD)'}`);
 if (results.errors.length) {
   results.errors.forEach((e) => console.log(`  \x1b[31mERROR: ${e}\x1b[0m`));
 }

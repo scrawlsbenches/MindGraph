@@ -11,7 +11,7 @@
     "format": "prettier --write 'src/**/*.{js,ts,css}' build.js",
     "format:check": "prettier --check 'src/**/*.{js,ts,css}' build.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

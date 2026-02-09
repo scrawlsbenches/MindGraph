@@ -4,8 +4,11 @@
 
 import { CLUSTER_KEYWORDS, CLUSTER_COLORS, CROSS_CLUSTER_BRIDGES, random } from './config.js';
 
+/** @type {import('../../types/graph').GraphNode[]} */
 export const nodes = [];
+/** @type {import('../../types/graph').GraphEdge[]} */
 export const edges = [];
+/** @type {Map<number, Set<number>>} */
 export const adj = new Map();
 
 // Build nodes from cluster keywords
@@ -19,7 +22,10 @@ export const adj = new Map();
         cluster: ci,
         color: CLUSTER_COLORS[ci],
         r: wi < 4 ? 8 + random() * 5 : 2.5 + random() * 5,
-        x: 0, y: 0, vx: 0, vy: 0,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
         _a: (ci / CLUSTER_KEYWORDS.length) * Math.PI * 2 + (random() - 0.5) * 1.0,
         _d: 0.12 + random() * 0.28,
         _jx: (random() - 0.5) * 0.12,
@@ -29,6 +35,11 @@ export const adj = new Map();
         visible: true,
         alpha: 1,
         targetAlpha: 1,
+        labelW: 0,
+        labelH: 0,
+        fpRight: 0,
+        fpLeft: 0,
+        fpY: 0,
       });
     });
   });
@@ -45,10 +56,15 @@ export const adj = new Map();
 
 export const NUM_NODES = nodes.length;
 
+/**
+ * @param {number} a
+ * @param {number} b
+ * @param {number} w
+ */
 function addEdge(a, b, w) {
   if (a === b) return;
   const k = Math.min(a, b) + '-' + Math.max(a, b);
-  if (edges.find(e => e.key === k)) return;
+  if (edges.find((e) => e.key === k)) return;
   edges.push({ a, b, weight: w, key: k });
   if (!adj.has(a)) adj.set(a, new Set());
   if (!adj.has(b)) adj.set(b, new Set());
@@ -62,9 +78,7 @@ function addEdge(a, b, w) {
     for (let i = 0; i < words.length; i++) {
       const nc = 2 + Math.floor(random() * 3);
       for (let c = 0; c < nc; c++) {
-        const j = random() < 0.4
-          ? Math.floor(random() * 4)
-          : Math.floor(random() * words.length);
+        const j = random() < 0.4 ? Math.floor(random() * 4) : Math.floor(random() * words.length);
         if (j !== i) addEdge(base + i, base + j, 0.5 + random() * 0.5);
       }
     }
@@ -78,12 +92,16 @@ function addEdge(a, b, w) {
 
 (function buildCrossClusterEdges() {
   CROSS_CLUSTER_BRIDGES.forEach(([c1, c2, w1, w2]) => {
-    const n1 = nodes.find(n => n.cluster === c1 && n.word === w1);
-    const n2 = nodes.find(n => n.cluster === c2 && n.word === w2);
+    const n1 = nodes.find((n) => n.cluster === c1 && n.word === w1);
+    const n2 = nodes.find((n) => n.cluster === c2 && n.word === w2);
     if (n1 && n2) addEdge(n1.id, n2.id, 0.3 + random() * 0.3);
   });
 })();
 
+/**
+ * @param {number} id
+ * @returns {Set<number>}
+ */
 export function neighbors(id) {
   return adj.get(id) || new Set();
 }

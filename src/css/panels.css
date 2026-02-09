@@ -9,7 +9,9 @@
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  transition: width 250ms ease, opacity 200ms ease;
+  transition:
+    width 250ms ease,
+    opacity 200ms ease;
 }
 
 .right-panel.collapsed {
@@ -90,8 +92,15 @@
   flex-wrap: wrap;
 }
 
-.section-header h3 { font-size: 13px; font-weight: 700; }
-.section-header .subtitle { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+.section-header h3 {
+  font-size: 13px;
+  font-weight: 700;
+}
+.section-header .subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
 
 .section-header-actions {
   display: flex;
@@ -123,7 +132,12 @@
 }
 
 /* Action rows & buttons */
-.action-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.action-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
 
 .action-btn {
   font-family: inherit;

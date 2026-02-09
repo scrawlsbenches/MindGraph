@@ -87,8 +87,12 @@
   margin-top: 14px;
 }
 
-.ai-chat-body h4:first-child { margin-top: 0; }
-.ai-chat-body p { margin-bottom: 10px; }
+.ai-chat-body h4:first-child {
+  margin-top: 0;
+}
+.ai-chat-body p {
+  margin-bottom: 10px;
+}
 
 .ai-chat-footer {
   border-top: 1px solid var(--border-color);
@@ -131,7 +135,9 @@
   outline: none;
 }
 
-.ai-chat-input::placeholder { color: var(--text-muted); }
+.ai-chat-input::placeholder {
+  color: var(--text-muted);
+}
 
 .ai-model-label {
   font-size: 10px;

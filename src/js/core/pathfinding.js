@@ -4,7 +4,12 @@
 
 import { adj, nodes } from './graph-data.js';
 
-// BFS shortest path between two nodes
+/**
+ * BFS shortest path between two nodes.
+ * @param {number} startId
+ * @param {number} endId
+ * @returns {number[] | null}
+ */
 export function bfsPath(startId, endId) {
   if (startId === endId) return [startId];
   const visited = new Set([startId]);
@@ -12,7 +17,7 @@ export function bfsPath(startId, endId) {
   while (queue.length) {
     const path = queue.shift();
     const last = path[path.length - 1];
-    for (const nb of (adj.get(last) || [])) {
+    for (const nb of adj.get(last) || []) {
       if (!nodes[nb].visible) continue;
       if (nb === endId) return [...path, nb];
       if (!visited.has(nb)) {
@@ -24,7 +29,12 @@ export function bfsPath(startId, endId) {
   return null;
 }
 
-// N-depth neighborhood from a node
+/**
+ * N-depth neighborhood from a node.
+ * @param {number} nodeId
+ * @param {number} depth
+ * @returns {Map<number, number>}
+ */
 export function getNeighborsAtDepth(nodeId, depth) {
   const result = new Map();
   result.set(nodeId, 0);
@@ -32,7 +42,7 @@ export function getNeighborsAtDepth(nodeId, depth) {
   for (let d = 1; d <= depth; d++) {
     const next = new Set();
     for (const id of frontier) {
-      for (const nb of (adj.get(id) || [])) {
+      for (const nb of adj.get(id) || []) {
         if (!result.has(nb) && nodes[nb].visible) {
           result.set(nb, d);
           next.add(nb);

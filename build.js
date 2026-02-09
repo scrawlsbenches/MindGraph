@@ -29,7 +29,8 @@ const cssOptions = {
 if (!fs.existsSync('dist')) fs.mkdirSync('dist');
 
 function generateHTML() {
-  const html = fs.readFileSync('index.html', 'utf8')
+  const html = fs
+    .readFileSync('index.html', 'utf8')
     .replace('dist/mindgraph.min.css', 'mindgraph.min.css')
     .replace('dist/mindgraph.min.js', 'mindgraph.min.js');
   fs.writeFileSync('dist/index.html', html);
@@ -64,7 +65,13 @@ async function watch() {
 }
 
 if (isWatch) {
-  watch().catch((err) => { console.error(err); process.exit(1); });
+  watch().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 } else {
-  build().catch((err) => { console.error(err); process.exit(1); });
+  build().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }
