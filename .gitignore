@@ -22,5 +22,4 @@ Thumbs.db
 # Playwright
 test-results/
 playwright-report/
-tests/e2e/screenshots/
 .tmp/

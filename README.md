@@ -4,7 +4,7 @@
 
 Zero runtime dependencies. 66 KB production bundle. Pure vanilla JavaScript + Canvas 2D.
 
-![MindGraph — Force-directed graph visualization](docs/screenshots/01-page-load.png)
+![MindGraph — Force-directed graph visualization](tests/e2e/screenshots/01-page-load.png)
 
 ---
 
@@ -23,19 +23,19 @@ Zero runtime dependencies. 66 KB production bundle. Pure vanilla JavaScript + Ca
 
 Click any node to inspect its connections, cross-cluster bridges, and neighborhood at configurable depth (1-3 hops).
 
-![Node detail panel](docs/screenshots/03-node-detail.png)
+![Node detail panel](tests/e2e/screenshots/03-node-detail.png)
 
 ### Search & Cluster Filtering
 
 Type to search nodes in real-time. Use cluster pills to filter by topic. Non-matching nodes fade out while the graph layout is preserved.
 
-![Search filtering](docs/screenshots/04-search-filter.png)
+![Search filtering](tests/e2e/screenshots/04-search-filter.png)
 
 ### Analytics Dashboard
 
 Eight analytics tabs provide network metrics, sentiment analysis, content gap detection, and structural analysis — all computed client-side from the graph data.
 
-![Analytics tabs](docs/screenshots/05-analytics-tabs.png)
+![Analytics tabs](tests/e2e/screenshots/05-analytics-tabs.png)
 
 ---
 
