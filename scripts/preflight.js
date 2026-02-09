@@ -9,7 +9,7 @@
  *   1. npm install (skipped if node_modules is current)
  *   2. git fetch origin
  *   3. git status (uncommitted changes)
- *   4. git branch -r --no-merged origin/main (orphan branch work)
+ *   4. git branch --no-merged origin/main (orphan branch work, local + remote)
  *   5. npm run check (lint + typecheck + test + build)
  *   6. Parse ROADMAP.md for next incomplete item
  */
@@ -72,13 +72,23 @@ if (status) {
   console.log('   Clean.');
 }
 
-/* Step 4: orphan branches */
+/* Step 4: orphan branches (local + remote) */
 heading('4. Orphan branch work');
-const unmerged = run('git branch -r --no-merged origin/main', { allowFail: true });
-const branches = unmerged
+const currentBranch = run('git branch --show-current', { allowFail: true });
+const unmergedRemote = run('git branch -r --no-merged origin/main', { allowFail: true });
+const unmergedLocal = run('git branch --no-merged origin/main', { allowFail: true });
+const remoteBranches = unmergedRemote
   .split('\n')
   .map((b) => b.trim())
   .filter((b) => b && !b.includes('origin/main') && !b.includes('->'));
+const localBranches = unmergedLocal
+  .split('\n')
+  .map((b) => b.trim().replace(/^\* /, ''))
+  .filter((b) => b && b !== currentBranch);
+// Deduplicate: remove local branches that have a remote tracking counterpart
+const remoteNames = new Set(remoteBranches.map((b) => b.replace('origin/', '')));
+const localOnly = localBranches.filter((b) => !remoteNames.has(b));
+const branches = [...remoteBranches, ...localOnly.map((b) => `${b} (local only)`)];
 if (branches.length) {
   console.log('   Branches with unmerged commits:');
   branches.forEach((b) => console.log(`     ${b}`));
@@ -106,9 +116,9 @@ try {
   const lines = roadmap.split('\n');
   let nextItem = null;
   for (const line of lines) {
-    // Match table rows that are NOT struck through (no ~~) and NOT marked Done/Skipped
+    // Match table rows that are NOT struck through (~~) — all completed items use strikethrough
     if (line.startsWith('|') && !line.startsWith('|---') && !line.startsWith('| #')) {
-      const isComplete = /~~|Done|Skipped|\*\*Done\*\*/i.test(line);
+      const isComplete = /~~/.test(line);
       if (!isComplete) {
         nextItem = line;
         break;
