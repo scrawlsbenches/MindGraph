@@ -17,6 +17,10 @@ export function updateDepthMap() {
   state.depthMap = state.selectedNode ? getNeighborsAtDepth(state.selectedNode.id, state.selectionDepth) : null;
 }
 
+/**
+ * @param {import('../../types/graph').GraphNode} n
+ * @returns {boolean}
+ */
 export function isHL(n) {
   if (!n.visible) return false;
   if (state.searchQuery && !n.matchesSearch) return false;
@@ -31,6 +35,10 @@ function _nodeDepthLevel(n) {
   return state.depthMap.get(n.id) ?? -1;
 }
 
+/**
+ * @param {import('../../types/graph').GraphEdge} e
+ * @returns {boolean}
+ */
 export function isEdgeHL(e) {
   const a = nodes[e.a],
     b = nodes[e.b];

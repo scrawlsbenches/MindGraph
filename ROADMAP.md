@@ -89,7 +89,7 @@ These are hygiene items that should be done before any feature work.
 
 | # | Item | Effort | Impact |
 |---|---|---|---|
-| 2.1 | Define core interfaces (`Node`, `Edge`, `State`) | 1 session | Type foundation |
+| ~~2.1~~ | ~~Define core interfaces (`Node`, `Edge`, `State`)~~ | ~~1 session~~ | ~~Done — GraphNode, GraphEdge, AppState interfaces + @type annotations on state.js, graph-data.js, pathfinding.js, camera.js, state-actions.js, renderer.js, tabs.js~~ |
 | 2.2 | Migrate `core/` to TypeScript | 1 session | Type-safe data layer |
 | 2.3 | Migrate `ui/` to TypeScript | 1-2 sessions | Type-safe rendering/interaction |
 | 2.4 | Migrate `analytics/` to TypeScript | 1 session | Type-safe tab builders |

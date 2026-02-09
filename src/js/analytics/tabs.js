@@ -10,6 +10,10 @@ export function computeDegrees() {
   return nodes.map((n) => ({ n, deg: adj.get(n.id)?.size || 0 }));
 }
 
+/**
+ * @param {import('../../types/graph').GraphNode} n
+ * @returns {number}
+ */
 export function computeBridgeScore(n) {
   const nb = adj.get(n.id) || new Set();
   return [...nb].filter((id) => nodes[id].cluster !== n.cluster).length;
@@ -56,6 +60,10 @@ export function computeClusteringCoeff() {
   return count > 0 ? total / count : 0;
 }
 
+/**
+ * @param {string} word
+ * @returns {number}
+ */
 export function wordSentiment(word) {
   const positive = [
     'nice',

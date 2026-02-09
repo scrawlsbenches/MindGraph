@@ -7,6 +7,7 @@ import { flyToNode } from '../core/camera.js';
 import { updateDepthMap } from './renderer.js';
 import { updateND, updatePathBanner } from './panels.js';
 
+/** @param {import('../../types/graph').GraphNode} n */
 export function selectNode(n) {
   if (state.selectedNode === n) {
     state.selectedNode = null;
@@ -25,6 +26,7 @@ export function selectNode(n) {
   updateND();
 }
 
+/** @param {number} d */
 export function setDepth(d) {
   state.selectionDepth = d;
   updateDepthMap();

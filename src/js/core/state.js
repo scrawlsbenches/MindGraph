@@ -6,6 +6,7 @@
    and read/write properties directly.
    ============================================ */
 
+/** @type {import('../../types/graph').AppState} */
 export const state = {
   // Camera & viewport
   camX: 0,

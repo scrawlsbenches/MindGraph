@@ -4,8 +4,11 @@
 
 import { CLUSTER_KEYWORDS, CLUSTER_COLORS, CROSS_CLUSTER_BRIDGES, random } from './config.js';
 
+/** @type {import('../../types/graph').GraphNode[]} */
 export const nodes = [];
+/** @type {import('../../types/graph').GraphEdge[]} */
 export const edges = [];
+/** @type {Map<number, Set<number>>} */
 export const adj = new Map();
 
 // Build nodes from cluster keywords
@@ -32,6 +35,11 @@ export const adj = new Map();
         visible: true,
         alpha: 1,
         targetAlpha: 1,
+        labelW: 0,
+        labelH: 0,
+        fpRight: 0,
+        fpLeft: 0,
+        fpY: 0,
       });
     });
   });
@@ -48,6 +56,11 @@ export const adj = new Map();
 
 export const NUM_NODES = nodes.length;
 
+/**
+ * @param {number} a
+ * @param {number} b
+ * @param {number} w
+ */
 function addEdge(a, b, w) {
   if (a === b) return;
   const k = Math.min(a, b) + '-' + Math.max(a, b);
@@ -85,6 +98,10 @@ function addEdge(a, b, w) {
   });
 })();
 
+/**
+ * @param {number} id
+ * @returns {Set<number>}
+ */
 export function neighbors(id) {
   return adj.get(id) || new Set();
 }
