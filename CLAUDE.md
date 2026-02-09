@@ -10,14 +10,16 @@ For repository metrics and tech stack see `ASSESSMENT.md`.
 
 ## Session Start Checklist
 
-Run these steps at the beginning of every session, before doing any work. Complete all steps silently, then present one summary to the user with findings and the next roadmap item.
+Run `npm run preflight` at the beginning of every session, before doing any work. The script runs these steps automatically:
 
-1. `npm install`
-2. `git fetch origin`
-3. `git status` — note any uncommitted or staged changes.
-4. Check for orphan branch work: `git branch -r --no-merged origin/main` — note any branches with unmerged commits.
-5. `npm run check` — if anything fails, fix it before starting new work.
-6. Read `ROADMAP.md` — identify the next incomplete item.
+1. Install dependencies (skipped if `node_modules` is current)
+2. Fetch remote branches
+3. Check for uncommitted changes
+4. Check for orphan branch work (branches with unmerged commits)
+5. Run the full check (`npm run check` — lint + typecheck + test + build)
+6. Find the next incomplete roadmap item
+
+If the check fails, assess whether the failure is related to the current branch or pre-existing. Report the failure to the user and ask how they want to proceed — do not silently attempt large fixes.
 
 Present a summary to the user: uncommitted work (if any), branches with unmerged work (if any), check pass/fail, and the next roadmap item. Ask what they want to work on.
 
@@ -45,7 +47,7 @@ Each document has a single responsibility. Information lives in one place only.
 **When making changes:**
 - If you fix an issue from `CODE_REVIEW.md`, mark it `[RESOLVED]` there. Do not maintain a shadow copy here.
 - If you complete a roadmap item, mark it done in `ROADMAP.md`. Do not maintain a shadow copy here.
-- If you add/remove files or dependencies, update the structure tree in `ASSESSMENT.md`.
+- If you add/remove files or dependencies, update the structure tree in this file and the dependency list in `ASSESSMENT.md`.
 - If you change architecture, state shape, or conventions, update this file.
 - **Documentation updates go in the same commit as the code change.** Not a follow-up.
 
@@ -64,6 +66,7 @@ MindGraph is a client-side network text analytics visualization tool. It renders
 ## Quick Reference
 
 ```bash
+npm run preflight    # Session start checklist (install, fetch, status, check, roadmap)
 npm install          # Install dev dependencies
 npm run build        # Bundle src/ → dist/ (JS 42KB + CSS 24KB + HTML 8KB)
 npm run dev          # Watch mode (rebuilds on change, no minification)
@@ -107,6 +110,8 @@ MindGraph/
 ├── .prettierrc                     # Prettier config (single quotes, 2-space, semi)
 ├── .editorconfig                   # Editor settings (indent, EOL, charset)
 ├── tsconfig.json                   # TypeScript checkJs config (no emit)
+├── scripts/
+│   └── preflight.js                # Session start checklist (npm run preflight)
 ├── tests/                          # All tests
 │   ├── geometry.test.js            # convexHull, expandHull (10 tests)
 │   ├── pathfinding.test.js         # bfsPath, getNeighborsAtDepth (14 tests)
@@ -280,15 +285,23 @@ Enforced by ESLint (flat config + eslint-config-prettier) and Prettier. Run `npm
 
 ### When Modifying Code
 
-1. **Read the file first.** Understand the existing code before changing it.
-2. **Respect the layer model.** `core/` should not access DOM (except `camera.js`). `ui/` should not compute analytics data. `analytics/` should not mutate state.
-3. **Don't add to `window` globals.** If you need event handlers in dynamic HTML, use event delegation (attach listener to parent, check `e.target`), not inline `onclick`.
-4. **Don't hardcode the number 5.** Derive cluster count from `CLUSTER_NAMES.length` or `CLUSTER_KEYWORDS.length`.
-5. **Invalidate `state.labelVisCache`** whenever you change node visibility, selection, search, or positions. Set it to `null` to force recomputation.
-6. **Call `updateND()` after changing `state.selectedNode`.** Call `updateStatus()` after changing node visibility or search state.
-7. **Node selection logic belongs in `state-actions.js`.** Don't put selection orchestration in `interaction.js` or `panels.js` to avoid reintroducing circular dependencies.
-8. **Keep bundle small.** Zero runtime dependencies is a feature. Don't add libraries unless absolutely necessary and discussed first.
-9. **When adding physics constants**, put them in `config.js` with descriptive names, not as magic numbers in `physics.js`.
+**Read the file first.** Understand existing code before changing it.
+
+**Principles:**
+- **Respect the layer model.** `core/` must not access DOM (except `camera.js`). `ui/` must not compute analytics data. `analytics/` must not mutate state.
+- **Don't add `window` globals.** Use event delegation (attach listener to parent, check `e.target`), not inline `onclick`.
+- **Don't hardcode cluster count.** Derive from `CLUSTER_NAMES.length` or `CLUSTER_KEYWORDS.length`.
+- **Keep bundle small.** Zero runtime dependencies is a feature. Don't add libraries without discussion.
+- **Node selection logic belongs in `state-actions.js`.** Not in `interaction.js` or `panels.js` — avoids circular dependencies.
+
+**Required side effects — if you change X, also do Y:**
+
+| If you change... | Then also... |
+|---|---|
+| Node visibility, selection, search, or positions | Set `state.labelVisCache = null` |
+| `state.selectedNode` | Call `updateND()` |
+| Node visibility or search state | Call `updateStatus()` |
+| Physics tuning values | Add named constants in `config.js`, not magic numbers in `physics.js` |
 
 ---
 
