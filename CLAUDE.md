@@ -10,6 +10,8 @@ For repository metrics and tech stack see `ASSESSMENT.md`.
 
 ## Session Start Checklist
 
+**Do not create or checkout branches.** The correct branch is already checked out before the session starts. Branch management is handled externally — never run `git checkout`, `git checkout -b`, or `git switch` as part of startup.
+
 Run `npm run preflight` at the beginning of every session, before doing any work. The script runs these steps automatically:
 
 1. Install dependencies (skipped if `node_modules` is current)
@@ -27,6 +29,7 @@ Present a summary to the user: uncommitted work (if any), branches with unmerged
 
 ## Branch Management
 
+- **Branches are pre-configured.** The session starts on the correct branch. Do not create, checkout, or switch branches — this is managed externally.
 - **Never delete branches.** They serve as commit history reference.
 - **One branch per task.** Don't reuse old branches for new work.
 
@@ -397,3 +400,4 @@ Lessons learned from previous sessions. Check here before debugging unexpected b
 - **`eslint-config-prettier` disables ESLint formatting rules — it does NOT enforce Prettier.** Only `npm run format:check` enforces Prettier. This is why `format:check` is the first step in `npm run check`.
 - **When pushing `nodes[]` items, include ALL `GraphNode` properties.** The label footprint props (`labelW`, `labelH`, `fpRight`, `fpLeft`, `fpY`) must be initialized (default to 0) — they're overwritten immediately but `tsc` validates the full interface.
 - **Do not rely on auto-memory files.** They are ephemeral and get deleted between sessions. All operational knowledge belongs in this file.
+- **Do not run `git checkout` or `git checkout -b` at session start.** The correct branch is already checked out before the session begins. Branch management is external — attempting checkout is redundant and risks switching to the wrong branch.
