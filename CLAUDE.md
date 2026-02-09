@@ -25,13 +25,6 @@ Present a summary to the user: uncommitted work (if any), branches with unmerged
 
 ---
 
-## Branch Management
-
-- **Never delete branches.** They serve as commit history reference.
-- **One branch per task.** Don't reuse old branches for new work.
-
----
-
 ## Documentation Rules
 
 Each document has a single responsibility. Information lives in one place only.
