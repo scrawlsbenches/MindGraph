@@ -68,7 +68,7 @@ MindGraph/
 │   ├── serve.js                    # Static file server for E2E tests
 │   └── e2e/                        # Playwright E2E smoke tests
 │       ├── smoke.spec.mjs          # 8 smoke tests with screenshots
-│       └── screenshots/            # Captured screenshots (.gitignored)
+│       └── screenshots/            # Captured screenshots (checked in, merge=ours)
 ├── dist/                           # Build output (.gitignored)
 │   ├── index.html
 │   ├── mindgraph.min.js            # + source map
@@ -404,7 +404,7 @@ Full details in `ROADMAP.md`. Current phase: **Phase 3 (Architecture) — partia
 | Analytics tabs render | All 8 tabs produce content | `05-analytics-tabs.png` |
 | Path mode toggles | Button active/inactive state toggles | — |
 
-**Screenshots** saved to `tests/e2e/screenshots/` (gitignored). Layout is deterministic (seeded PRNG) so screenshots are reproducible.
+**Screenshots** saved to `tests/e2e/screenshots/` and checked into git. Layout is deterministic (seeded PRNG) so screenshots are reproducible. `.gitattributes` marks these files as `merge=ours binary`, so merge conflicts auto-resolve by keeping the current branch's version.
 
 **Server:** `tests/serve.js` — minimal Node.js static server, started automatically by Playwright's `webServer` config.
 
