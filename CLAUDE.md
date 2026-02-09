@@ -10,7 +10,7 @@ For repository metrics and tech stack see `ASSESSMENT.md`.
 
 ## Session Start Checklist
 
-Run `npm run preflight` at the beginning of every session, before doing any work. The script runs these steps automatically:
+Run `npm run preflight` at the beginning of every session, before doing any work. Do not run any other commands first — no branch checks, no git commands, no file reads. The script runs these steps automatically:
 
 1. Install dependencies (skipped if `node_modules` is current)
 2. Fetch remote branches
@@ -390,3 +390,4 @@ Lessons learned from previous sessions. Check here before debugging unexpected b
 - **`eslint-config-prettier` disables ESLint formatting rules — it does NOT enforce Prettier.** Only `npm run format:check` enforces Prettier. This is why `format:check` is the first step in `npm run check`.
 - **When pushing `nodes[]` items, include ALL `GraphNode` properties.** The label footprint props (`labelW`, `labelH`, `fpRight`, `fpLeft`, `fpY`) must be initialized (default to 0) — they're overwritten immediately but `tsc` validates the full interface.
 - **Do not rely on auto-memory files.** They are ephemeral and get deleted between sessions. All operational knowledge belongs in this file.
+- **Never create memory files outside this project folder.** All session notes, memory files, and operational knowledge must live in the repository (this file), not in external directories like `~/.claude/`.
