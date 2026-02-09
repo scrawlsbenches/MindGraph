@@ -339,7 +339,7 @@ index.html ↔ every ui/ file                (element IDs)
 
 ## HTML Element ID Map
 
-These IDs in `index.html` are referenced directly by JavaScript. Do not rename or remove without updating all JS references.
+These IDs in `index.html` are referenced directly by JavaScript. Do not rename or remove without updating all JS references. This map is manually maintained and may drift — verify against `index.html` when in doubt.
 
 ```
 graphCanvas     → camera.js (canvas ref, ctx)
@@ -383,3 +383,13 @@ aiChatClose     → panels.js (close handler)
 statusText      → panels.js (status bar text)
 docTitle        → index.html only (static)
 ```
+
+---
+
+## Known Pitfalls
+
+Lessons learned from previous sessions. Check here before debugging unexpected behavior.
+
+- **`execSync` with `stdio: 'inherit'` returns `null`.** Do not chain `.trim()` on the result. Use `stdio: 'pipe'` if you need the output as a string.
+- **`ASSESSMENT.md` goes stale first.** Metrics, dependency counts, and documentation status drift with every change. Treat it as approximate and verify when it matters.
+- **The HTML Element ID Map above is manually maintained.** It will drift from `index.html` as IDs are added or changed. When working with element IDs, verify against the actual HTML.
