@@ -17,7 +17,7 @@ MindGraph is a client-side network text analytics visualization tool. It renders
 
 ## 2. Repository Structure
 
-See `CLAUDE.md` → "Repository Structure" for the authoritative file tree.
+Run `ls` or use file exploration to discover the file tree. Source code lives in `src/js/` (14 files), `src/css/` (10 files), and `src/types/` (2 files).
 
 ---
 
