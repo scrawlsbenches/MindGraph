@@ -9,7 +9,8 @@ import { simulate, positionNodes } from './core/physics.js';
 import { resize, graphArea, updateFlyTo } from './core/camera.js';
 import { draw } from './ui/renderer.js';
 import { drawMinimap } from './ui/minimap.js';
-import { selectNode } from './ui/interaction.js';
+import { selectNode } from './ui/state-actions.js';
+import './ui/interaction.js'; // Side-effect: registers canvas event listeners
 import { toggleCluster, searchInput } from './ui/search.js';
 import { updateND, updateStatus, panelContent } from './ui/panels.js';
 import { buildTab0 } from './analytics/tabs.js';
@@ -43,15 +44,16 @@ document.getElementById('graphLegend').innerHTML =
 panelContent.innerHTML = buildTab0();
 
 // Mode toggle
-document.getElementById('modeToggle').onclick = function() {
+const modeToggle = /** @type {HTMLElement} */ (document.getElementById('modeToggle'));
+modeToggle.onclick = function() {
   this.classList.toggle('off');
 };
 
 // AI chat drag
-const aiChat = document.getElementById('aiChat');
+const aiChat = /** @type {HTMLElement} */ (document.getElementById('aiChat'));
 let chatDragging = false, chatDX, chatDY;
-aiChat.querySelector('.ai-chat-header').onmousedown = e => {
-  if (e.target.tagName === 'BUTTON') return;
+/** @type {HTMLElement} */ (aiChat.querySelector('.ai-chat-header')).onmousedown = e => {
+  if (/** @type {HTMLElement} */ (e.target).tagName === 'BUTTON') return;
   chatDragging = true;
   const r = aiChat.getBoundingClientRect();
   chatDX = e.clientX - r.left;

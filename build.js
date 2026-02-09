@@ -1,34 +1,44 @@
 const esbuild = require('esbuild');
 const fs = require('fs');
 
+const isWatch = process.argv.includes('--watch');
+
+// Shared build options
+const jsOptions = {
+  entryPoints: ['src/js/app.js'],
+  bundle: true,
+  minify: !isWatch,
+  sourcemap: true,
+  format: 'iife',
+  outfile: 'dist/mindgraph.min.js',
+  metafile: true,
+  logLevel: isWatch ? 'info' : 'silent',
+};
+
+const cssOptions = {
+  entryPoints: ['src/css/bundle.css'],
+  bundle: true,
+  minify: !isWatch,
+  sourcemap: true,
+  outfile: 'dist/mindgraph.min.css',
+  metafile: true,
+  logLevel: isWatch ? 'info' : 'silent',
+};
+
 // Ensure dist directory exists
 if (!fs.existsSync('dist')) fs.mkdirSync('dist');
 
-async function build() {
-  // Bundle & minify JS
-  const jsResult = await esbuild.build({
-    entryPoints: ['src/js/app.js'],
-    bundle: true,
-    minify: true,
-    format: 'iife',
-    outfile: 'dist/mindgraph.min.js',
-    metafile: true,
-  });
-
-  // Bundle & minify CSS
-  const cssResult = await esbuild.build({
-    entryPoints: ['src/css/bundle.css'],
-    bundle: true,
-    minify: true,
-    outfile: 'dist/mindgraph.min.css',
-    metafile: true,
-  });
-
-  // Generate dist/index.html with local asset paths
+function generateHTML() {
   const html = fs.readFileSync('index.html', 'utf8')
     .replace('dist/mindgraph.min.css', 'mindgraph.min.css')
     .replace('dist/mindgraph.min.js', 'mindgraph.min.js');
   fs.writeFileSync('dist/index.html', html);
+}
+
+async function build() {
+  const jsResult = await esbuild.build(jsOptions);
+  await esbuild.build(cssOptions);
+  generateHTML();
 
   // Report sizes
   const jsSize = fs.statSync('dist/mindgraph.min.js').size;
@@ -38,13 +48,23 @@ async function build() {
   console.log(`JS:   ${(jsSize / 1024).toFixed(1)} KB (dist/mindgraph.min.js)`);
   console.log(`CSS:  ${(cssSize / 1024).toFixed(1)} KB (dist/mindgraph.min.css)`);
 
-  // Show module breakdown
   const jsText = esbuild.analyzeMetafileSync(jsResult.metafile);
   console.log('\nJS module breakdown:');
   console.log(jsText);
 }
 
-build().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+async function watch() {
+  const jsCtx = await esbuild.context(jsOptions);
+  const cssCtx = await esbuild.context(cssOptions);
+  generateHTML();
+
+  await jsCtx.watch();
+  await cssCtx.watch();
+  console.log('Watching for changes...');
+}
+
+if (isWatch) {
+  watch().catch((err) => { console.error(err); process.exit(1); });
+} else {
+  build().catch((err) => { console.error(err); process.exit(1); });
+}

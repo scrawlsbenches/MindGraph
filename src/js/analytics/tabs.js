@@ -6,7 +6,7 @@ import { nodes, adj, edges, NUM_NODES } from '../core/graph-data.js';
 import { CLUSTER_NAMES, CLUSTER_KEYWORDS, CLUSTER_COLORS } from '../core/config.js';
 
 // Helper: compute degrees
-function computeDegrees() {
+export function computeDegrees() {
   return nodes.map(n => ({ n, deg: adj.get(n.id)?.size || 0 }));
 }
 
@@ -16,7 +16,8 @@ export function computeBridgeScore(n) {
 }
 
 function computeClusterEdgeMatrix() {
-  const m = Array.from({ length: 5 }, () => Array(5).fill(0));
+  const nc = CLUSTER_NAMES.length;
+  const m = Array.from({ length: nc }, () => Array(nc).fill(0));
   for (const e of edges) {
     const ca = nodes[e.a].cluster, cb = nodes[e.b].cluster;
     m[ca][cb]++;
@@ -25,7 +26,7 @@ function computeClusterEdgeMatrix() {
   return m;
 }
 
-function computeGraphDensity() {
+export function computeGraphDensity() {
   const n = NUM_NODES;
   return edges.length / (n * (n - 1) / 2);
 }
@@ -35,7 +36,7 @@ function computeAvgDegree() {
   return degs.reduce((s, d) => s + d.deg, 0) / degs.length;
 }
 
-function computeClusteringCoeff() {
+export function computeClusteringCoeff() {
   let total = 0, count = 0;
   const sample = nodes.filter((_, i) => i % 3 === 0);
   for (const n of sample) {
@@ -53,7 +54,7 @@ function computeClusteringCoeff() {
   return count > 0 ? total / count : 0;
 }
 
-function wordSentiment(word) {
+export function wordSentiment(word) {
   const positive = ['nice', 'bright', 'sweet', 'warm', 'soft', 'gentle', 'calm', 'kind', 'discover', 'explore',
     'music', 'dance', 'friend', 'home', 'dream', 'wonder', 'light', 'quiet', 'new', 'open', 'festival', 'art', 'show', 'book', 'surprise'];
   const negative = ['strange', 'odd', 'push', 'pull', 'run', 'fast', 'far', 'end', 'leave', 'stop',

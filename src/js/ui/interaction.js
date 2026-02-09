@@ -3,12 +3,12 @@
    ============================================ */
 
 import { state } from '../core/state.js';
-import { canvas, s2w, flyToNode, tooltip } from '../core/camera.js';
+import { canvas, s2w, tooltip } from '../core/camera.js';
 import { nodes, NUM_NODES, neighbors } from '../core/graph-data.js';
 import { bfsPath } from '../core/pathfinding.js';
 import { CLUSTER_NAMES } from '../core/config.js';
 import { updateND, updatePathBanner } from './panels.js';
-import { updateDepthMap } from './renderer.js';
+import { selectNode, setDepth } from './state-actions.js';
 
 let dragNode = null, isPanning = false, psx = 0, psy = 0, csx = 0, csy = 0, mdTime = 0;
 
@@ -79,7 +79,7 @@ canvas.addEventListener('mousemove', e => {
   }
 });
 
-canvas.addEventListener('mouseup', e => {
+canvas.addEventListener('mouseup', () => {
   if (dragNode && Date.now() - mdTime < 200) selectNode(dragNode);
   if (dragNode) state.labelVisCache = null;
   dragNode = null; isPanning = false;
@@ -121,33 +121,7 @@ document.getElementById('btnZoomOut').onclick = () => state.camZoom = Math.max(0
 document.getElementById('btnFit').onclick = () => { state.camX = 0; state.camY = 0; state.camZoom = 1; };
 document.getElementById('btnUnpin').onclick = () => nodes.forEach(n => n.pinned = false);
 
-// Node selection & detail
-export function selectNode(n) {
-  if (state.selectedNode === n) {
-    state.selectedNode = null; state.depthMap = null;
-  } else {
-    state.selectedNode = n;
-    state.pathResult = null; state.pathStart = null; state.pathParticles = [];
-    updatePathBanner();
-    state.selectionDepth = 1;
-    updateDepthMap();
-    flyToNode(n);
-  }
-  state.labelVisCache = null;
-  updateND();
-}
-
-export function setDepth(d) {
-  state.selectionDepth = d;
-  updateDepthMap();
-  state.labelVisCache = null;
-  document.querySelectorAll('.nd-depth-btn').forEach(b =>
-    b.classList.toggle('active', +b.dataset.depth === d)
-  );
-  updateND();
-}
-
 // Depth button click handlers
-document.querySelectorAll('.nd-depth-btn').forEach(btn => {
+document.querySelectorAll('.nd-depth-btn').forEach((/** @type {HTMLElement} */ btn) => {
   btn.addEventListener('click', () => setDepth(+btn.dataset.depth));
 });
