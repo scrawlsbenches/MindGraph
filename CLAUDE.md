@@ -10,20 +10,23 @@ For repository metrics and tech stack see `ASSESSMENT.md`.
 
 ## Session Start Checklist
 
-Run these steps at the beginning of every session, before doing any work.
+Run these steps at the beginning of every session, before doing any work. Complete all steps silently, then present one summary to the user with findings and the next roadmap item.
 
-1. **Check for stale branches.** List all remote branches (`git branch -r`). For each non-main branch, check if it has unmerged commits (`git log origin/main..<branch> --oneline`). Report any branches with orphan work. Do not delete branches — they serve as history.
-2. **Check for uncommitted work.** Run `git status`. Report any unstaged or staged changes.
-3. **Run the full check.** `npm run check` (lint + typecheck + test + build). If anything fails, fix it before starting new work.
-4. **Review current roadmap state.** Read `ROADMAP.md` and identify the next incomplete item. Confirm with the user before starting work.
+1. `npm install`
+2. `git fetch origin`
+3. `git status` — note any uncommitted or staged changes.
+4. Check for orphan branch work: `git branch -r --no-merged origin/main` — note any branches with unmerged commits.
+5. `npm run check` — if anything fails, fix it before starting new work.
+6. Read `ROADMAP.md` — identify the next incomplete item.
+
+Present a summary to the user: uncommitted work (if any), branches with unmerged work (if any), check pass/fail, and the next roadmap item. Ask what they want to work on.
 
 ---
 
 ## Branch Management
 
-- **Never delete branches.** Merged branches are kept as commit history reference.
-- **Audit branches at session start.** Check for unmerged work on all remote branches (see checklist above).
-- **One branch per task.** Each piece of work gets its own branch. Don't reuse old branches for new work.
+- **Never delete branches.** They serve as commit history reference.
+- **One branch per task.** Don't reuse old branches for new work.
 
 ---
 
