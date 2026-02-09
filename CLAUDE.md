@@ -1,7 +1,55 @@
 # CLAUDE.md — MindGraph Project Guide
 
 This file is the authoritative reference for any AI or developer working on MindGraph.
-It encodes project knowledge, architecture, known issues, conventions, and maintenance rules.
+It contains workflow procedures, architecture knowledge, and coding conventions.
+
+For known issues see `CODE_REVIEW.md`. For the development roadmap see `ROADMAP.md`.
+For repository metrics and tech stack see `ASSESSMENT.md`.
+
+---
+
+## Session Start Checklist
+
+Run `npm run preflight` at the beginning of every session, before doing any work. The script runs these steps automatically:
+
+1. Install dependencies (skipped if `node_modules` is current)
+2. Fetch remote branches
+3. Check for uncommitted changes
+4. Check for orphan branch work (branches with unmerged commits)
+5. Run the full check (`npm run check` — lint + typecheck + test + build)
+6. Find the next incomplete roadmap item
+
+If the check fails, assess whether the failure is related to the current branch or pre-existing. Report the failure to the user and ask how they want to proceed — do not silently attempt large fixes.
+
+Present a summary to the user: uncommitted work (if any), branches with unmerged work (if any), check pass/fail, and the next roadmap item. Ask what they want to work on.
+
+---
+
+## Branch Management
+
+- **Never delete branches.** They serve as commit history reference.
+- **One branch per task.** Don't reuse old branches for new work.
+
+---
+
+## Documentation Rules
+
+Each document has a single responsibility. Information lives in one place only.
+
+| Document | Owns | Does NOT contain |
+|---|---|---|
+| `CLAUDE.md` | Workflow SOPs, architecture, coding conventions, file reference | Issue tracking, roadmap status, metrics |
+| `CODE_REVIEW.md` | Known issues with severity ratings | Architecture docs, conventions |
+| `ROADMAP.md` | Phased plan, priorities, completion status | Issue details, coding rules |
+| `ASSESSMENT.md` | Repository metrics, tech stack, dependency list, performance/security notes | Plans, conventions |
+| `README.md` | User-facing docs: features, setup, usage | Internal dev procedures |
+
+**When making changes:**
+- If you fix an issue from `CODE_REVIEW.md`, mark it `[RESOLVED]` there. Do not maintain a shadow copy here.
+- If you complete a roadmap item, mark it done in `ROADMAP.md`. Do not maintain a shadow copy here.
+- If you add/remove files or dependencies, update the structure tree in this file and the dependency list in `ASSESSMENT.md`.
+- If you change architecture, state shape, or conventions, update this file.
+- **Documentation updates go in the same commit as the code change.** Not a follow-up.
 
 ---
 
@@ -18,6 +66,7 @@ MindGraph is a client-side network text analytics visualization tool. It renders
 ## Quick Reference
 
 ```bash
+npm run preflight    # Session start checklist (install, fetch, status, check, roadmap)
 npm install          # Install dev dependencies
 npm run build        # Bundle src/ → dist/ (JS 42KB + CSS 24KB + HTML 8KB)
 npm run dev          # Watch mode (rebuilds on change, no minification)
@@ -46,10 +95,10 @@ For development without rebuilding, edit `index.html` to load source directly:
 
 ```
 MindGraph/
-├── CLAUDE.md                       # THIS FILE — project guide for AI/dev
-├── ASSESSMENT.md                   # Repository assessment report
-├── CODE_REVIEW.md                  # Detailed code review with severity ratings
-├── ROADMAP.md                      # Phased recommendations & architecture vision
+├── CLAUDE.md                       # THIS FILE — workflow SOPs, architecture, conventions
+├── ASSESSMENT.md                   # Repository metrics, tech stack, performance/security notes
+├── CODE_REVIEW.md                  # Known issues with severity ratings
+├── ROADMAP.md                      # Phased plan & architecture vision
 ├── README.md                       # User-facing project documentation
 ├── LICENSE                         # ISC license
 ├── index.html                      # Application shell (192 lines, element IDs used by JS)
@@ -61,6 +110,8 @@ MindGraph/
 ├── .prettierrc                     # Prettier config (single quotes, 2-space, semi)
 ├── .editorconfig                   # Editor settings (indent, EOL, charset)
 ├── tsconfig.json                   # TypeScript checkJs config (no emit)
+├── scripts/
+│   └── preflight.js                # Session start checklist (npm run preflight)
 ├── tests/                          # All tests
 │   ├── geometry.test.js            # convexHull, expandHull (10 tests)
 │   ├── pathfinding.test.js         # bfsPath, getNeighborsAtDepth (14 tests)
@@ -68,7 +119,7 @@ MindGraph/
 │   ├── serve.js                    # Static file server for E2E tests
 │   └── e2e/                        # Playwright E2E smoke tests
 │       ├── smoke.spec.mjs          # 8 smoke tests with screenshots
-│       └── screenshots/            # Captured screenshots (.gitignored)
+│       └── screenshots/            # Captured screenshots (checked in, merge=ours)
 ├── dist/                           # Build output (.gitignored)
 │   ├── index.html
 │   ├── mindgraph.min.js            # + source map
@@ -186,39 +237,34 @@ window.nodes, window.searchInput, window.activeCluster (getter/setter)
 
 ---
 
-## Known Issues & Technical Debt
+## Testing
 
-Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
+### Unit Tests (Vitest) — 35 tests
 
-### ~~CRITICAL~~ [RESOLVED]
-- ~~**Zero test coverage**~~ — 35 unit tests now cover geometry, pathfinding, and analytics helpers. Remaining: integration, visual regression, E2E.
+| Test File | Functions Tested | Tests |
+|---|---|---|
+| `tests/geometry.test.js` | `convexHull`, `expandHull` | 10 |
+| `tests/pathfinding.test.js` | `bfsPath`, `getNeighborsAtDepth` | 14 |
+| `tests/tabs-helpers.test.js` | `wordSentiment`, `computeBridgeScore`, `computeDegrees`, `computeGraphDensity`, `computeClusteringCoeff` | 11 |
 
-### HIGH
-- **HTML string concatenation with inline onclick** — `tabs.js` (433 lines) builds all analytics HTML via string concat with `window` global calls. XSS surface if data becomes dynamic.
-- **Window global dispatch** — Functions/data on `window` for onclick strings. Defeats ES modules.
-- **No data/presentation separation** — `tabs.js` mixes computation, HTML generation, and event binding.
-- **No data layer abstraction** — Graph is hardcoded, no import/export/persistence.
-- **Tight HTML/JS coupling** — JS references 20+ element IDs from `index.html` with no validation.
+**Mock strategy:** Modules with side effects (`graph-data.js`) are mocked via `vi.mock()`. Use `vi.hoisted()` for shared mock state (pathfinding tests) or getter-based mocks (tabs-helpers tests) to work around `vi.mock` hoisting.
 
-### MEDIUM
-- ~~**Non-deterministic layout**~~ [RESOLVED] Seeded PRNG (mulberry32, seed=42) replaces all `Math.random()` calls.
-- ~~**Hardcoded cluster count (5)**~~ [RESOLVED] Derived from `CLUSTER_NAMES.length` throughout.
-- **Convex hulls recomputed every frame** — `computeHulls()` called at 60fps inside `draw()`.
-- ~~**Physics magic numbers**~~ [RESOLVED] 16 named constants in `PHYSICS` object in `config.js`.
-- ~~**Circular dependency**~~ [RESOLVED] Extracted `state-actions.js`.
-- ~~**Renderer god function**~~ [RESOLVED] Decomposed into 6 focused rendering pass functions.
-- **Module-level side effects** — `graph-data.js` generates data via IIFEs on import.
-- **No error boundaries** — Zero try/catch in entire codebase.
-- **No event system** — State changes propagate by manual function calls.
-- **Cryptic variable names** — `_a`, `_d`, `_jx`, `_jy`, `psx`, `csy`, `gmw()`.
+### E2E Tests (Playwright) — 8 smoke tests
 
-### LOW
-- ~~**Dead file** — `infranodus-ui-5.html`~~ [RESOLVED] Deleted.
-- ~~**dist/ committed to git**~~ [RESOLVED] Added to `.gitignore`, removed from tracking.
-- **Edge dedup is O(n)** — `edges.find()` linear scan; should use a Set.
-- **BFS copies full path per queue entry** — O(V * path_length) memory.
-- **Naive sentiment** — Hardcoded word lists with linear search, recreated per call.
-- ~~**Missing LICENSE file**~~ [RESOLVED] ISC LICENSE file created.
+| Test | What It Verifies | Screenshot |
+|---|---|---|
+| Page loads without errors | No JS crashes, canvas renders | `01-page-load.png` |
+| Canvas exists and has dimensions | Canvas visible, width/height > 100 | — |
+| 100 nodes in memory | `window.nodes.length === 100` | — |
+| Click canvas selects node | AI chat closed, canvas clickable | `02-canvas-click.png` |
+| Programmatic node selection | `selectNode(nodes[0])` opens detail panel | `03-node-detail.png` |
+| Search filters nodes | Status bar shows `Search: "dream"` | `04-search-filter.png` |
+| Analytics tabs render | All 8 tabs produce content | `05-analytics-tabs.png` |
+| Path mode toggles | Button active/inactive state toggles | — |
+
+**Screenshots** saved to `tests/e2e/screenshots/` and checked into git. Layout is deterministic (seeded PRNG) so screenshots are reproducible. `.gitattributes` marks these files as `merge=ours binary`, so merge conflicts auto-resolve by keeping the current branch's version.
+
+**Server:** `tests/serve.js` — minimal Node.js static server, started automatically by Playwright's `webServer` config.
 
 ---
 
@@ -239,36 +285,23 @@ Enforced by ESLint (flat config + eslint-config-prettier) and Prettier. Run `npm
 
 ### When Modifying Code
 
-1. **Read the file first.** Understand the existing code before changing it.
-2. **Respect the layer model.** `core/` should not access DOM (except `camera.js`). `ui/` should not compute analytics data. `analytics/` should not mutate state.
-3. **Don't add to `window` globals.** If you need event handlers in dynamic HTML, use event delegation (attach listener to parent, check `e.target`), not inline `onclick`.
-4. **Don't hardcode the number 5.** Derive cluster count from `CLUSTER_NAMES.length` or `CLUSTER_KEYWORDS.length`.
-5. **Invalidate `state.labelVisCache`** whenever you change node visibility, selection, search, or positions. Set it to `null` to force recomputation.
-6. **Call `updateND()` after changing `state.selectedNode`.** Call `updateStatus()` after changing node visibility or search state.
-7. **Node selection logic belongs in `state-actions.js`.** Don't put selection orchestration in `interaction.js` or `panels.js` to avoid reintroducing circular dependencies.
-8. **Keep bundle small.** Zero runtime dependencies is a feature. Don't add libraries unless absolutely necessary and discussed first.
-9. **When adding physics constants**, put them in `config.js` with descriptive names, not as magic numbers in `physics.js`.
+**Read the file first.** Understand existing code before changing it.
 
-### When Modifying Documentation
+**Principles:**
+- **Respect the layer model.** `core/` must not access DOM (except `camera.js`). `ui/` must not compute analytics data. `analytics/` must not mutate state.
+- **Don't add `window` globals.** Use event delegation (attach listener to parent, check `e.target`), not inline `onclick`.
+- **Don't hardcode cluster count.** Derive from `CLUSTER_NAMES.length` or `CLUSTER_KEYWORDS.length`.
+- **Keep bundle small.** Zero runtime dependencies is a feature. Don't add libraries without discussion.
+- **Node selection logic belongs in `state-actions.js`.** Not in `interaction.js` or `panels.js` — avoids circular dependencies.
 
-These documents exist and must be kept in sync:
+**Required side effects — if you change X, also do Y:**
 
-| Document | Purpose | Update When |
-|---|---|---|
-| `CLAUDE.md` | AI/dev project guide (this file) | Any structural change, new convention, or resolved issue |
-| `ASSESSMENT.md` | Repository structure, tech stack, metrics | Dependency changes, file additions/removals, metric changes |
-| `CODE_REVIEW.md` | Known issues with severity ratings | Issues resolved (mark as fixed), new issues found |
-| `ROADMAP.md` | Phased plan, architecture vision | Phase items completed, priorities change, new phases added |
-| `README.md` | User-facing docs | Features added, setup steps change, structure changes |
-
-**Rules for doc updates:**
-- When you fix a known issue from `CODE_REVIEW.md`, add a `[RESOLVED]` prefix to that section.
-- When you complete a roadmap item, mark it with a checkmark or strikethrough in `ROADMAP.md`.
-- When you add a new file or directory, update the structure trees in `CLAUDE.md` and `ASSESSMENT.md`.
-- When you add a new npm script, update the "Quick Reference" section in this file.
-- When you change the state object shape, update the "State Management" section in this file.
-- When you add or resolve a known issue, update the "Known Issues" section in this file.
-- Keep line counts approximate — don't update them for every small edit, but refresh them during major reviews.
+| If you change... | Then also... |
+|---|---|
+| Node visibility, selection, search, or positions | Set `state.labelVisCache = null` |
+| `state.selectedNode` | Call `updateND()` |
+| Node visibility or search state | Call `updateStatus()` |
+| Physics tuning values | Add named constants in `config.js`, not magic numbers in `physics.js` |
 
 ---
 
@@ -306,7 +339,7 @@ index.html ↔ every ui/ file                (element IDs)
 
 ## HTML Element ID Map
 
-These IDs in `index.html` are referenced directly by JavaScript. Do not rename or remove without updating all JS references.
+These IDs in `index.html` are referenced directly by JavaScript. Do not rename or remove without updating all JS references. This map is manually maintained and may drift — verify against `index.html` when in doubt.
 
 ```
 graphCanvas     → camera.js (canvas ref, ctx)
@@ -353,87 +386,10 @@ docTitle        → index.html only (static)
 
 ---
 
-## Roadmap Summary
+## Known Pitfalls
 
-Full details in `ROADMAP.md`. Current phase: **Phase 3 (Architecture) — partially complete**.
+Lessons learned from previous sessions. Check here before debugging unexpected behavior.
 
-| Phase | Focus | Status |
-|---|---|---|
-| 0 | ESLint, Prettier, tsconfig checkJs, remove dead files, .gitignore dist/ | **Done** |
-| 1 | Vitest unit tests, Playwright smoke test | **Done** (35 unit tests + 8 E2E tests) |
-| 2 | TypeScript migration (core/ first, then ui/, then analytics/) | Not started |
-| 3 | Architecture fixes (seeded PRNG, physics constants, decompose renderer, break circular dep) | **Partial** (3.3-3.6 done; 3.1, 3.2, 3.7 remain) |
-| 4 | Features (data import/export, persistence, real AI chat, responsive, a11y) | Not started |
-| 5 | Scale (WebGL, real clustering algorithm, NLP sentiment, plugins) | Not started |
-
-### Immediate Next Actions (in order)
-
-1. ~~Delete `infranodus-ui-5.html`~~ Done.
-2. ~~Add `dist/` to `.gitignore`~~ Done.
-3. ~~Add ESLint + Prettier~~ Done.
-4. ~~Add `tsconfig.json` with `allowJs` + `checkJs`~~ Done.
-5. ~~Add Vitest + unit tests (geometry, pathfinding, analytics helpers)~~ Done.
-6. ~~Add seeded PRNG to `graph-data.js`~~ Done.
-7. Define TypeScript interfaces for Node, Edge, State
-8. Migrate `core/state.ts` as first TypeScript file
-
----
-
-## Testing
-
-### Unit Tests (Vitest) — 35 tests passing
-
-| Test File | Functions Tested | Tests |
-|---|---|---|
-| `tests/geometry.test.js` | `convexHull`, `expandHull` | 10 |
-| `tests/pathfinding.test.js` | `bfsPath`, `getNeighborsAtDepth` | 14 |
-| `tests/tabs-helpers.test.js` | `wordSentiment`, `computeBridgeScore`, `computeDegrees`, `computeGraphDensity`, `computeClusteringCoeff` | 11 |
-
-**Mock strategy:** Modules with side effects (`graph-data.js`) are mocked via `vi.mock()`. Use `vi.hoisted()` for shared mock state (pathfinding tests) or getter-based mocks (tabs-helpers tests) to work around `vi.mock` hoisting.
-
-### E2E Tests (Playwright) — 8 smoke tests passing
-
-| Test | What It Verifies | Screenshot |
-|---|---|---|
-| Page loads without errors | No JS crashes, canvas renders | `01-page-load.png` |
-| Canvas exists and has dimensions | Canvas visible, width/height > 100 | — |
-| 100 nodes in memory | `window.nodes.length === 100` | — |
-| Click canvas selects node | AI chat closed, canvas clickable | `02-canvas-click.png` |
-| Programmatic node selection | `selectNode(nodes[0])` opens detail panel | `03-node-detail.png` |
-| Search filters nodes | Status bar shows `Search: "dream"` | `04-search-filter.png` |
-| Analytics tabs render | All 8 tabs produce content | `05-analytics-tabs.png` |
-| Path mode toggles | Button active/inactive state toggles | — |
-
-**Screenshots** saved to `tests/e2e/screenshots/` (gitignored). Layout is deterministic (seeded PRNG) so screenshots are reproducible.
-
-**Server:** `tests/serve.js` — minimal Node.js static server, started automatically by Playwright's `webServer` config.
-
-| Test | What It Verifies |
-|---|---|
-| Page loads without errors | No JS crashes, canvas renders |
-| Graph visible on canvas | Screenshot comparison |
-| Click node → detail panel opens | Selection flow works |
-| Search filters nodes | Nodes dim/hide correctly |
-| Path finder works | Two-node selection, path renders |
-| Analytics tabs load | Tab switching, content renders |
-
----
-
-## Performance Notes
-
-- Physics simulation is O(n * 40) per frame (20-node repulsion window + 20-node same-cluster pass). Fine for 100 nodes, degrades at 500+.
-- Convex hulls recomputed every frame when `state.showHulls` is true. Cache opportunity.
-- Label collision uses `labelVisCache` (Set of visible node IDs). Invalidated by setting `state.labelVisCache = null`.
-- Minimap renders every 3rd frame (`frameCount % 3 === 0`).
-- Edge dedup in `addEdge` is O(edges) linear scan. Only matters at init, not at runtime.
-- Canvas clears and redraws everything every frame. No dirty rectangle optimization.
-
----
-
-## Security Notes
-
-- `innerHTML` is used in `tabs.js` and `panels.js` with string concatenation. Currently safe because all data is hardcoded in `config.js`. **If dynamic data is ever loaded, all innerHTML usage must be replaced with DOM APIs or sanitized.**
-- Inline `onclick` handlers in HTML strings reference `window` globals. These would be XSS vectors with untrusted data.
-- No Content Security Policy (CSP) in `index.html`.
-- No input sanitization anywhere.
-- Eight devDependencies (esbuild, eslint, prettier, typescript, vitest, etc.) — all well-maintained, none shipped to users.
+- **`execSync` with `stdio: 'inherit'` returns `null`.** Do not chain `.trim()` on the result. Use `stdio: 'pipe'` if you need the output as a string.
+- **`ASSESSMENT.md` goes stale first.** Metrics, dependency counts, and documentation status drift with every change. Treat it as approximate and verify when it matters.
+- **The HTML Element ID Map above is manually maintained.** It will drift from `index.html` as IDs are added or changed. When working with element IDs, verify against the actual HTML.

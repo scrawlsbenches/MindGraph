@@ -17,54 +17,7 @@ MindGraph is a client-side network text analytics visualization tool. It renders
 
 ## 2. Repository Structure
 
-```
-MindGraph/                          (727 KB total)
-├── index.html                      # Application shell (192 lines)
-├── build.js                        # esbuild configuration (51 lines)
-├── package.json                    # NPM config (1 dev dependency)
-├── package-lock.json               # Lockfile
-├── README.md                       # Project documentation (99 lines)
-├── .gitignore                      # Ignore rules
-├── tests/                          # Unit tests (Vitest)
-│   ├── geometry.test.js            # convexHull, expandHull (10 tests)
-│   ├── pathfinding.test.js         # bfsPath, getNeighborsAtDepth (14 tests)
-│   └── tabs-helpers.test.js        # wordSentiment, bridgeScore, degrees, density, clustering (11 tests)
-├── dist/                           # Production build output
-│   ├── index.html                  # Self-contained (8 KB)
-│   ├── mindgraph.min.js            # Bundled JS (42 KB)
-│   └── mindgraph.min.css           # Bundled CSS (24 KB)
-└── src/                            # Source code (3,180 lines)
-    ├── js/                         # JavaScript ES modules (1,747 lines)
-    │   ├── app.js                  # Entry point, render loop (97 lines)
-    │   ├── core/                   # Data & algorithms (~600 lines)
-    │   │   ├── state.js            # Centralized mutable state (~35 lines)
-    │   │   ├── config.js           # Constants, PHYSICS params, PRNG (~85 lines)
-    │   │   ├── graph-data.js       # Node/edge generation (~90 lines)
-    │   │   ├── physics.js          # Force-directed simulation (~120 lines)
-    │   │   ├── camera.js           # Canvas transforms & fly-to (~50 lines)
-    │   │   ├── geometry.js         # Convex hull & splines (~62 lines)
-    │   │   └── pathfinding.js      # BFS shortest path (~46 lines)
-    │   ├── ui/                     # Rendering & interaction (~690 lines)
-    │   │   ├── renderer.js         # Rendering passes (~314 lines)
-    │   │   ├── interaction.js      # Mouse/keyboard events (~125 lines)
-    │   │   ├── state-actions.js    # Node selection & depth (~35 lines)
-    │   │   ├── panels.js           # Analytics panel & node details (~150 lines)
-    │   │   ├── minimap.js          # Minimap rendering (~101 lines)
-    │   │   └── search.js           # Search & cluster filter (~60 lines)
-    │   └── analytics/              # Analytics tab builders (433 lines)
-    │       └── tabs.js             # All 8 tab generators
-    └── css/                        # Stylesheets (1,433 lines)
-        ├── bundle.css              # CSS entry point
-        ├── variables.css           # Design tokens
-        ├── base.css                # Reset & layout
-        ├── topbar.css              # Navigation bar
-        ├── toolbar.css             # Action toolbar
-        ├── sidebar.css             # Left icon sidebar
-        ├── graph.css               # Canvas & overlays
-        ├── panels.css              # Right panel
-        ├── chat.css                # AI chat panel
-        └── analytics.css           # Analytics tab styles
-```
+See `CLAUDE.md` → "Repository Structure" for the authoritative file tree.
 
 ---
 
@@ -149,13 +102,9 @@ The application has no runtime dependencies. All functionality is implemented fr
 | @vitest/coverage-v8 | ^4.0.18 | Test coverage reporting |
 | @playwright/test | ^1.56.0 | E2E browser testing |
 
-### Missing Dependencies (recommended)
+### Missing Dependencies
 
-| Category | Suggested |
-|---|---|
-| Test framework | vitest |
-| E2E testing | playwright |
-| Pre-commit hooks | husky + lint-staged |
+None. All recommended tooling (vitest, playwright, eslint, prettier, typescript) is installed.
 
 ---
 
@@ -170,7 +119,7 @@ The build is minimal and functional:
 
 **Output sizes:** JS ~42 KB, CSS ~24 KB, HTML ~8 KB
 
-**Missing:** Dev server, hot reload, watch mode, source maps, environment variables.
+**Missing:** Dev server, hot reload, environment variables. Watch mode and source maps have been added.
 
 ---
 
@@ -179,11 +128,12 @@ The build is minimal and functional:
 | Document | Status | Quality |
 |---|---|---|
 | README.md | Present | Good -- covers features, structure, getting started |
+| CLAUDE.md | Present | Workflow SOPs, architecture, coding conventions |
+| CODE_REVIEW.md | Present | Known issues with severity ratings |
+| ROADMAP.md | Present | Phased plan & architecture vision |
+| LICENSE file | Present | ISC license |
 | CONTRIBUTING.md | Missing | -- |
 | CHANGELOG.md | Missing | -- |
-| LICENSE file | Missing | ISC declared in package.json but no LICENSE file |
-| Architecture docs | Missing | -- |
-| API docs | Missing | -- |
 | Inline comments | Minimal | Module headers only, no JSDoc |
 
 ---
