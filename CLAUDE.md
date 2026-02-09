@@ -106,7 +106,7 @@ MindGraph/
 ├── package.json                    # Dev deps: esbuild, eslint, prettier, typescript, vitest, playwright
 ├── vitest.config.js                # Vitest config (excludes e2e tests)
 ├── playwright.config.js            # Playwright E2E config (chromium, webServer)
-├── eslint.config.js                # ESLint flat config (recommended + prettier)
+├── eslint.config.mjs               # ESLint flat config (recommended + prettier, ESM)
 ├── .prettierrc                     # Prettier config (single quotes, 2-space, semi)
 ├── .editorconfig                   # Editor settings (indent, EOL, charset)
 ├── tsconfig.json                   # TypeScript checkJs config (no emit)
