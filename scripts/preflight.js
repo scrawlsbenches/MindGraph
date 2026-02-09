@@ -22,11 +22,12 @@ const root = join(__dirname, '..');
 const results = { warnings: [], errors: [] };
 
 function run(cmd, opts = {}) {
+  const { allowFail, ...execOpts } = opts;
   try {
-    const result = execSync(cmd, { cwd: root, encoding: 'utf8', stdio: opts.stdio || 'pipe', ...opts });
+    const result = execSync(cmd, { cwd: root, encoding: 'utf8', stdio: 'pipe', ...execOpts });
     return result ? result.trim() : '';
   } catch (e) {
-    if (opts.allowFail) return e.stdout ? e.stdout.trim() : '';
+    if (allowFail) return e.stdout ? e.stdout.trim() : '';
     throw e;
   }
 }
@@ -116,8 +117,9 @@ try {
   const lines = roadmap.split('\n');
   let nextItem = null;
   for (const line of lines) {
-    // Match table rows that are NOT struck through (~~) — all completed items use strikethrough
-    if (line.startsWith('|') && !line.startsWith('|---') && !line.startsWith('| #')) {
+    // Match only numbered roadmap rows (e.g. "| 2.1 | ..." or "| ~~3.3~~ | ...")
+    // Avoids matching non-roadmap tables like Risk Assessment
+    if (/^\|\s*(?:~~)?\d+\.\d+(?:~~)?\s*\|/.test(line)) {
       const isComplete = /~~/.test(line);
       if (!isComplete) {
         nextItem = line;
