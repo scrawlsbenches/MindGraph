@@ -1,0 +1,2 @@
+# Treat screenshots as binary — accept current branch on merge conflicts
+tests/e2e/screenshots/*.png merge=ours binary
