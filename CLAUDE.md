@@ -393,3 +393,7 @@ Lessons learned from previous sessions. Check here before debugging unexpected b
 - **`execSync` with `stdio: 'inherit'` returns `null`.** Do not chain `.trim()` on the result. Use `stdio: 'pipe'` if you need the output as a string.
 - **`ASSESSMENT.md` goes stale first.** Metrics, dependency counts, and documentation status drift with every change. Treat it as approximate and verify when it matters.
 - **The HTML Element ID Map above is manually maintained.** It will drift from `index.html` as IDs are added or changed. When working with element IDs, verify against the actual HTML.
+- **Always run E2E tests (`npm run test:e2e`) before committing.** Even non-visual changes (formatting, annotations) can regenerate screenshots. Commit updated screenshots alongside code changes — never in a separate follow-up commit.
+- **`eslint-config-prettier` disables ESLint formatting rules — it does NOT enforce Prettier.** Only `npm run format:check` enforces Prettier. This is why `format:check` is the first step in `npm run check`.
+- **When pushing `nodes[]` items, include ALL `GraphNode` properties.** The label footprint props (`labelW`, `labelH`, `fpRight`, `fpLeft`, `fpY`) must be initialized (default to 0) — they're overwritten immediately but `tsc` validates the full interface.
+- **Do not rely on auto-memory files.** They are ephemeral and get deleted between sessions. All operational knowledge belongs in this file.
