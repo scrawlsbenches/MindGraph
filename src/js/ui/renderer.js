@@ -4,7 +4,7 @@
 
 import { state } from '../core/state.js';
 import { random } from '../core/config.js';
-import { CLUSTER_COLORS, FONT } from '../core/config.js';
+import { CLUSTER_COLORS, CLUSTER_NAMES, FONT } from '../core/config.js';
 import { nodes, edges, neighbors } from '../core/graph-data.js';
 import { ctx } from '../core/camera.js';
 import { convexHull, expandHull, drawSmoothHull } from '../core/geometry.js';
@@ -49,7 +49,7 @@ export function isEdgeHL(e) {
 
 function computeHulls() {
   clusterHulls = [];
-  for (let ci = 0; ci < 5; ci++) {
+  for (let ci = 0; ci < CLUSTER_NAMES.length; ci++) {
     const clusterNodes = nodes.filter(n => n.cluster === ci && n.visible);
     const pts = clusterNodes.map(n => ({ x: n.x, y: n.y }));
     if (pts.length < 3) { clusterHulls.push(null); continue; }
@@ -59,7 +59,8 @@ function computeHulls() {
   }
 }
 
-// Path particles
+/* === Path Particles === */
+
 function updatePathParticles() {
   if (!state.pathResult || state.pathResult.length < 2) { state.pathParticles = []; return; }
   if (random() < 0.15) {
@@ -99,32 +100,25 @@ function drawPathParticles() {
   }
 }
 
-export function draw() {
-  ctx.clearRect(0, 0, state.W, state.H);
-  ctx.save();
-  ctx.translate(state.camX, state.camY);
-  ctx.scale(state.camZoom, state.camZoom);
+/* === Rendering Passes === */
 
-  const hasFocus = state.selectedNode || state.hoveredNode || state.pathResult;
-  const hasSearch = state.searchQuery.length > 0;
-
-  // Cluster hulls
-  if (state.showHulls && !state.pathResult) {
-    computeHulls();
-    for (const ch of clusterHulls) {
-      if (!ch || ch.hull.length < 3) continue;
-      drawSmoothHull(ctx, ch.hull, 0.35);
-      ctx.globalAlpha = ch.alpha;
-      ctx.fillStyle = ch.color + '0a';
-      ctx.strokeStyle = ch.color + '20';
-      ctx.lineWidth = 1.5 / state.camZoom;
-      ctx.fill();
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
+function drawClusterHulls() {
+  if (!state.showHulls || state.pathResult) return;
+  computeHulls();
+  for (const ch of clusterHulls) {
+    if (!ch || ch.hull.length < 3) continue;
+    drawSmoothHull(ctx, ch.hull, 0.35);
+    ctx.globalAlpha = ch.alpha;
+    ctx.fillStyle = ch.color + '0a';
+    ctx.strokeStyle = ch.color + '20';
+    ctx.lineWidth = 1.5 / state.camZoom;
+    ctx.fill();
+    ctx.stroke();
+    ctx.globalAlpha = 1;
   }
+}
 
-  // Edges
+function drawEdges(hasFocus) {
   for (const e of edges) {
     const a = nodes[e.a], b = nodes[e.b];
     if (!a.visible || !b.visible) continue;
@@ -166,12 +160,9 @@ export function draw() {
     ctx.shadowBlur = 0;
   }
   ctx.globalAlpha = 1;
+}
 
-  // Path particles
-  updatePathParticles();
-  drawPathParticles();
-
-  // Nodes
+function drawNodes(hasFocus, hasSearch) {
   for (const n of nodes) {
     if (!n.visible) continue;
     const hl = isHL(n);
@@ -215,60 +206,62 @@ export function draw() {
     }
     ctx.globalAlpha = 1;
   }
+}
 
-  // Label collision pass
-  if (!state.labelVisCache) {
-    const candidates = [];
-    for (const n of nodes) {
-      if (!n.visible || n.alpha < 0.5) continue;
-      const hl = isHL(n);
-      const isPathNode = state.pathResult && state.pathResult.includes(n.id);
-      const showLabel = (hl && (n.r > 4 || hasFocus || isPathNode)) || (!hasFocus && !hasSearch && n.r > 5);
-      if (!showLabel) continue;
+function computeLabelVisibility(hasFocus, hasSearch) {
+  if (state.labelVisCache) return;
 
-      let priority = 5;
-      if (n === state.selectedNode) priority = 100;
-      else if (isPathNode) priority = 90;
-      else if (n === state.hoveredNode) priority = 80;
-      else if (state.selectedNode && state.depthMap && state.depthMap.get(n.id) === 0) priority = 70;
-      else if (n.r >= 8 && hl) priority = 60;
-      else if (state.selectedNode && state.depthMap && state.depthMap.get(n.id) === 1) priority = 50;
-      else if (hl) priority = 30;
+  const candidates = [];
+  for (const n of nodes) {
+    if (!n.visible || n.alpha < 0.5) continue;
+    const hl = isHL(n);
+    const isPathNode = state.pathResult && state.pathResult.includes(n.id);
+    const showLabel = (hl && (n.r > 4 || hasFocus || isPathNode)) || (!hasFocus && !hasSearch && n.r > 5);
+    if (!showLabel) continue;
 
-      const fs = Math.max(isPathNode ? 11 : 9, n.r * 1.2);
-      const textW = n.word.length * fs * 0.55;
-      const lx = n.x + n.r + 4;
-      const baseY = n.y + fs * 0.35;
-      const ly = baseY - fs;
+    let priority = 5;
+    if (n === state.selectedNode) priority = 100;
+    else if (isPathNode) priority = 90;
+    else if (n === state.hoveredNode) priority = 80;
+    else if (state.selectedNode && state.depthMap && state.depthMap.get(n.id) === 0) priority = 70;
+    else if (n.r >= 8 && hl) priority = 60;
+    else if (state.selectedNode && state.depthMap && state.depthMap.get(n.id) === 1) priority = 50;
+    else if (hl) priority = 30;
 
-      candidates.push({ id: n.id, fs, lx, ly, baseY, w: textW, h: fs, priority });
-    }
+    const fs = Math.max(isPathNode ? 11 : 9, n.r * 1.2);
+    const textW = n.word.length * fs * 0.55;
+    const lx = n.x + n.r + 4;
+    const baseY = n.y + fs * 0.35;
+    const ly = baseY - fs;
 
-    candidates.sort((a, b) => b.priority - a.priority);
-
-    const placed = [];
-    const visible = new Set();
-    const MARGIN = 3;
-
-    for (const lbl of candidates) {
-      const testW = lbl.w * 0.8;
-      const testOff = (lbl.w - testW) / 2;
-      let overlaps = false;
-      for (const p of placed) {
-        if (lbl.lx + testOff < p.x + p.w + MARGIN && lbl.lx + testOff + testW + MARGIN > p.x &&
-            lbl.ly < p.y + p.h + MARGIN && lbl.ly + lbl.h + MARGIN > p.y) {
-          overlaps = true;
-          break;
-        }
-      }
-      if (overlaps && lbl.priority < 70) continue;
-      placed.push({ x: lbl.lx, y: lbl.ly, w: lbl.w, h: lbl.h });
-      visible.add(lbl.id);
-    }
-    state.labelVisCache = visible;
+    candidates.push({ id: n.id, fs, lx, ly, baseY, w: textW, h: fs, priority });
   }
 
-  // Draw labels
+  candidates.sort((a, b) => b.priority - a.priority);
+
+  const placed = [];
+  const visible = new Set();
+  const MARGIN = 3;
+
+  for (const lbl of candidates) {
+    const testW = lbl.w * 0.8;
+    const testOff = (lbl.w - testW) / 2;
+    let overlaps = false;
+    for (const p of placed) {
+      if (lbl.lx + testOff < p.x + p.w + MARGIN && lbl.lx + testOff + testW + MARGIN > p.x &&
+          lbl.ly < p.y + p.h + MARGIN && lbl.ly + lbl.h + MARGIN > p.y) {
+        overlaps = true;
+        break;
+      }
+    }
+    if (overlaps && lbl.priority < 70) continue;
+    placed.push({ x: lbl.lx, y: lbl.ly, w: lbl.w, h: lbl.h });
+    visible.add(lbl.id);
+  }
+  state.labelVisCache = visible;
+}
+
+function drawLabels(hasFocus, hasSearch) {
   for (const n of nodes) {
     if (!n.visible || !state.labelVisCache.has(n.id)) continue;
     const hl = isHL(n);
@@ -283,10 +276,9 @@ export function draw() {
     ctx.fillText(n.word, n.x + n.r + 4, n.y + fs * 0.35);
     ctx.globalAlpha = 1;
   }
+}
 
-  ctx.restore();
-
-  // Zoom badge
+function drawZoomBadge() {
   if (Math.abs(state.camZoom - 1) > 0.01) {
     ctx.fillStyle = 'rgba(255,255,255,0.1)';
     ctx.beginPath(); ctx.roundRect(12, state.H - 42, 70, 24, 4); ctx.fill();
@@ -294,4 +286,28 @@ export function draw() {
     ctx.textAlign = 'center'; ctx.fillText(Math.round(state.camZoom * 100) + '%', 47, state.H - 26);
     ctx.textAlign = 'start';
   }
+}
+
+/* === Main Draw (orchestrates rendering passes) === */
+
+export function draw() {
+  ctx.clearRect(0, 0, state.W, state.H);
+  ctx.save();
+  ctx.translate(state.camX, state.camY);
+  ctx.scale(state.camZoom, state.camZoom);
+
+  const hasFocus = state.selectedNode || state.hoveredNode || state.pathResult;
+  const hasSearch = state.searchQuery.length > 0;
+
+  drawClusterHulls();
+  drawEdges(hasFocus);
+  updatePathParticles();
+  drawPathParticles();
+  drawNodes(hasFocus, hasSearch);
+  computeLabelVisibility(hasFocus, hasSearch);
+  drawLabels(hasFocus, hasSearch);
+
+  ctx.restore();
+
+  drawZoomBadge();
 }

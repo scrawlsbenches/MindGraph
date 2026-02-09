@@ -76,20 +76,21 @@ MindGraph/
 └── src/
     ├── js/                         # 1,747 lines across 14 files
     │   ├── app.js                  # Entry point, render loop, window globals (97 lines)
-    │   ├── core/                   # Data layer & algorithms (559 lines)
-    │   │   ├── state.js            # Single mutable state object (35 lines)
-    │   │   ├── config.js           # Constants: cluster names/colors/keywords (43 lines)
-    │   │   ├── graph-data.js       # Node/edge generation via IIFEs (90 lines)
-    │   │   ├── physics.js          # Force-directed simulation (113 lines)
-    │   │   ├── camera.js           # Canvas context, transforms, fly-to (50 lines)
-    │   │   ├── geometry.js         # Graham scan convex hull, Catmull-Rom spline (62 lines)
-    │   │   └── pathfinding.js      # BFS shortest path, N-depth neighbors (46 lines)
-    │   ├── ui/                     # DOM/Canvas interaction (652 lines)
-    │   │   ├── renderer.js         # Main draw() loop — nodes, edges, hulls, labels (297 lines)
-    │   │   ├── interaction.js      # Mouse/keyboard events, node selection (154 lines)
-    │   │   ├── panels.js           # Right panel, node detail popover, path banner (148 lines)
-    │   │   ├── minimap.js          # Minimap canvas rendering + drag (101 lines)
-    │   │   └── search.js           # Search input, cluster filter pills (60 lines)
+    │   ├── core/                   # Data layer & algorithms (~600 lines)
+    │   │   ├── state.js            # Single mutable state object (~35 lines)
+    │   │   ├── config.js           # Constants, PHYSICS params, seeded PRNG (~85 lines)
+    │   │   ├── graph-data.js       # Node/edge generation via IIFEs (~90 lines)
+    │   │   ├── physics.js          # Force-directed simulation (~120 lines)
+    │   │   ├── camera.js           # Canvas context, transforms, fly-to (~50 lines)
+    │   │   ├── geometry.js         # Graham scan convex hull, Catmull-Rom spline (~62 lines)
+    │   │   └── pathfinding.js      # BFS shortest path, N-depth neighbors (~46 lines)
+    │   ├── ui/                     # DOM/Canvas interaction (~690 lines)
+    │   │   ├── renderer.js         # Rendering passes: hulls, edges, nodes, labels, badge (~314 lines)
+    │   │   ├── interaction.js      # Mouse/keyboard events (~125 lines)
+    │   │   ├── state-actions.js    # Node selection & depth actions (~35 lines)
+    │   │   ├── panels.js           # Right panel, node detail popover, path banner (~150 lines)
+    │   │   ├── minimap.js          # Minimap canvas rendering + drag (~101 lines)
+    │   │   └── search.js           # Search input, cluster filter pills (~60 lines)
     │   └── analytics/
     │       └── tabs.js             # 8 tab builder functions (433 lines)
     ├── types/                      # TypeScript declarations
@@ -179,9 +180,9 @@ window.selectNode, window.updateND, window.toggleCluster,
 window.nodes, window.searchInput, window.activeCluster (getter/setter)
 ```
 
-### Circular Dependency
+### State Actions Module
 
-`interaction.js` ↔ `panels.js` — both import from each other. Currently safe because ES module bindings resolve lazily (only used inside function bodies, not at module init). Do not add top-level usage of the other module's exports.
+`state-actions.js` contains `selectNode()` and `setDepth()` — the core state mutation functions for node selection. Both `interaction.js` and `panels.js` import from `state-actions.js`, avoiding any circular dependency.
 
 ---
 
@@ -196,16 +197,16 @@ Severity: CRITICAL > HIGH > MEDIUM > LOW. Full details in `CODE_REVIEW.md`.
 - **HTML string concatenation with inline onclick** — `tabs.js` (433 lines) builds all analytics HTML via string concat with `window` global calls. XSS surface if data becomes dynamic.
 - **Window global dispatch** — Functions/data on `window` for onclick strings. Defeats ES modules.
 - **No data/presentation separation** — `tabs.js` mixes computation, HTML generation, and event binding.
-- **Renderer god function** — `draw()` in `renderer.js` is 186 lines handling hulls, edges, particles, nodes, labels, and zoom badge.
 - **No data layer abstraction** — Graph is hardcoded, no import/export/persistence.
 - **Tight HTML/JS coupling** — JS references 20+ element IDs from `index.html` with no validation.
 
 ### MEDIUM
 - ~~**Non-deterministic layout**~~ [RESOLVED] Seeded PRNG (mulberry32, seed=42) replaces all `Math.random()` calls.
-- **Hardcoded cluster count (5)** — Appears in 8+ locations across physics, renderer, tabs, graph-data.
+- ~~**Hardcoded cluster count (5)**~~ [RESOLVED] Derived from `CLUSTER_NAMES.length` throughout.
 - **Convex hulls recomputed every frame** — `computeHulls()` called at 60fps inside `draw()`.
-- **Physics magic numbers** — 12+ tuning constants undocumented in `physics.js`.
-- **Circular dependency** — `interaction.js` ↔ `panels.js`.
+- ~~**Physics magic numbers**~~ [RESOLVED] 16 named constants in `PHYSICS` object in `config.js`.
+- ~~**Circular dependency**~~ [RESOLVED] Extracted `state-actions.js`.
+- ~~**Renderer god function**~~ [RESOLVED] Decomposed into 6 focused rendering pass functions.
 - **Module-level side effects** — `graph-data.js` generates data via IIFEs on import.
 - **No error boundaries** — Zero try/catch in entire codebase.
 - **No event system** — State changes propagate by manual function calls.
@@ -244,7 +245,7 @@ Enforced by ESLint (flat config + eslint-config-prettier) and Prettier. Run `npm
 4. **Don't hardcode the number 5.** Derive cluster count from `CLUSTER_NAMES.length` or `CLUSTER_KEYWORDS.length`.
 5. **Invalidate `state.labelVisCache`** whenever you change node visibility, selection, search, or positions. Set it to `null` to force recomputation.
 6. **Call `updateND()` after changing `state.selectedNode`.** Call `updateStatus()` after changing node visibility or search state.
-7. **Don't break the circular dep.** Don't use exports from `panels.js` at the top level of `interaction.js` or vice versa. Only reference them inside function bodies.
+7. **Node selection logic belongs in `state-actions.js`.** Don't put selection orchestration in `interaction.js` or `panels.js` to avoid reintroducing circular dependencies.
 8. **Keep bundle small.** Zero runtime dependencies is a feature. Don't add libraries unless absolutely necessary and discussed first.
 9. **When adding physics constants**, put them in `config.js` with descriptive names, not as magic numbers in `physics.js`.
 
@@ -294,8 +295,8 @@ These documents exist and must be kept in sync:
 ### Files That Are Tightly Coupled (Change Together)
 
 ```
-config.js ↔ graph-data.js ↔ physics.js    (cluster structure, node shape)
-interaction.js ↔ panels.js                 (circular dependency)
+config.js ↔ graph-data.js ↔ physics.js    (cluster structure, node shape, PHYSICS constants)
+state-actions.js ↔ panels.js ↔ renderer.js (selection, depth, UI updates)
 tabs.js ↔ app.js                           (window globals for onclick)
 renderer.js ↔ state.js                     (reads every state property)
 index.html ↔ every ui/ file                (element IDs)
@@ -354,14 +355,14 @@ docTitle        → index.html only (static)
 
 ## Roadmap Summary
 
-Full details in `ROADMAP.md`. Current phase: **Phase 1 (Quality Gates)**.
+Full details in `ROADMAP.md`. Current phase: **Phase 3 (Architecture) — partially complete**.
 
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | ESLint, Prettier, tsconfig checkJs, remove dead files, .gitignore dist/ | **Done** |
 | 1 | Vitest unit tests, Playwright smoke test | **Done** (35 unit tests + 8 E2E tests) |
 | 2 | TypeScript migration (core/ first, then ui/, then analytics/) | Not started |
-| 3 | Architecture fixes (events, extract data from tabs, seeded PRNG, decompose renderer) | Not started |
+| 3 | Architecture fixes (seeded PRNG, physics constants, decompose renderer, break circular dep) | **Partial** (3.3-3.6 done; 3.1, 3.2, 3.7 remain) |
 | 4 | Features (data import/export, persistence, real AI chat, responsive, a11y) | Not started |
 | 5 | Scale (WebGL, real clustering algorithm, NLP sentiment, plugins) | Not started |
 

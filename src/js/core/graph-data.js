@@ -20,7 +20,7 @@ export const adj = new Map();
         color: CLUSTER_COLORS[ci],
         r: wi < 4 ? 8 + random() * 5 : 2.5 + random() * 5,
         x: 0, y: 0, vx: 0, vy: 0,
-        _a: (ci / 5) * Math.PI * 2 + (random() - 0.5) * 1.0,
+        _a: (ci / CLUSTER_KEYWORDS.length) * Math.PI * 2 + (random() - 0.5) * 1.0,
         _d: 0.12 + random() * 0.28,
         _jx: (random() - 0.5) * 0.12,
         _jy: (random() - 0.5) * 0.12,
@@ -58,7 +58,7 @@ function addEdge(a, b, w) {
 
 (function buildIntraClusterEdges() {
   CLUSTER_KEYWORDS.forEach((words, ci) => {
-    const base = ci * 20;
+    const base = ci * words.length;
     for (let i = 0; i < words.length; i++) {
       const nc = 2 + Math.floor(random() * 3);
       for (let c = 0; c < nc; c++) {

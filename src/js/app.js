@@ -9,7 +9,8 @@ import { simulate, positionNodes } from './core/physics.js';
 import { resize, graphArea, updateFlyTo } from './core/camera.js';
 import { draw } from './ui/renderer.js';
 import { drawMinimap } from './ui/minimap.js';
-import { selectNode } from './ui/interaction.js';
+import { selectNode } from './ui/state-actions.js';
+import './ui/interaction.js'; // Side-effect: registers canvas event listeners
 import { toggleCluster, searchInput } from './ui/search.js';
 import { updateND, updateStatus, panelContent } from './ui/panels.js';
 import { buildTab0 } from './analytics/tabs.js';

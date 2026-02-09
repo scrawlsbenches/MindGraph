@@ -36,20 +36,21 @@ MindGraph/                          (727 KB total)
 └── src/                            # Source code (3,180 lines)
     ├── js/                         # JavaScript ES modules (1,747 lines)
     │   ├── app.js                  # Entry point, render loop (97 lines)
-    │   ├── core/                   # Data & algorithms (559 lines)
-    │   │   ├── state.js            # Centralized mutable state (35 lines)
-    │   │   ├── config.js           # Constants & cluster definitions (43 lines)
-    │   │   ├── graph-data.js       # Node/edge generation (90 lines)
-    │   │   ├── physics.js          # Force-directed simulation (113 lines)
-    │   │   ├── camera.js           # Canvas transforms & fly-to (50 lines)
-    │   │   ├── geometry.js         # Convex hull & splines (62 lines)
-    │   │   └── pathfinding.js      # BFS shortest path (46 lines)
-    │   ├── ui/                     # Rendering & interaction (652 lines)
-    │   │   ├── renderer.js         # Canvas draw loop (297 lines)
-    │   │   ├── interaction.js      # Mouse/keyboard events (154 lines)
-    │   │   ├── panels.js           # Analytics panel & node details (148 lines)
-    │   │   ├── minimap.js          # Minimap rendering (101 lines)
-    │   │   └── search.js           # Search & cluster filter (60 lines)
+    │   ├── core/                   # Data & algorithms (~600 lines)
+    │   │   ├── state.js            # Centralized mutable state (~35 lines)
+    │   │   ├── config.js           # Constants, PHYSICS params, PRNG (~85 lines)
+    │   │   ├── graph-data.js       # Node/edge generation (~90 lines)
+    │   │   ├── physics.js          # Force-directed simulation (~120 lines)
+    │   │   ├── camera.js           # Canvas transforms & fly-to (~50 lines)
+    │   │   ├── geometry.js         # Convex hull & splines (~62 lines)
+    │   │   └── pathfinding.js      # BFS shortest path (~46 lines)
+    │   ├── ui/                     # Rendering & interaction (~690 lines)
+    │   │   ├── renderer.js         # Rendering passes (~314 lines)
+    │   │   ├── interaction.js      # Mouse/keyboard events (~125 lines)
+    │   │   ├── state-actions.js    # Node selection & depth (~35 lines)
+    │   │   ├── panels.js           # Analytics panel & node details (~150 lines)
+    │   │   ├── minimap.js          # Minimap rendering (~101 lines)
+    │   │   └── search.js           # Search & cluster filter (~60 lines)
     │   └── analytics/              # Analytics tab builders (433 lines)
     │       └── tabs.js             # All 8 tab generators
     └── css/                        # Stylesheets (1,433 lines)
@@ -239,7 +240,7 @@ The commit history is clean and logical, showing a deliberate refactoring from p
 | Total source lines | ~3,200 |
 | JavaScript lines | ~1,750 |
 | CSS lines | 1,433 |
-| Source files | 26 (14 JS + 10 CSS + 2 .d.ts) |
+| Source files | 27 (15 JS + 10 CSS + 2 .d.ts) |
 | Runtime dependencies | 0 |
 | Dev dependencies | 9 |
 | Test coverage | 35 unit tests + 8 E2E smoke tests |

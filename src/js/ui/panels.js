@@ -6,7 +6,7 @@ import { state } from '../core/state.js';
 import { nodes, edges, neighbors } from '../core/graph-data.js';
 import { CLUSTER_NAMES } from '../core/config.js';
 import { buildTab0, buildTab1, buildTab2, buildTab3, buildTab4, buildTab5, buildTab6, buildTab7 } from '../analytics/tabs.js';
-import { selectNode } from './interaction.js';
+import { selectNode } from './state-actions.js';
 import { mmDiv } from './minimap.js';
 
 const nodeDetail = document.getElementById('nodeDetail');

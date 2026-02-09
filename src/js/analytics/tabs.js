@@ -16,7 +16,8 @@ export function computeBridgeScore(n) {
 }
 
 function computeClusterEdgeMatrix() {
-  const m = Array.from({ length: 5 }, () => Array(5).fill(0));
+  const nc = CLUSTER_NAMES.length;
+  const m = Array.from({ length: nc }, () => Array(nc).fill(0));
   for (const e of edges) {
     const ca = nodes[e.a].cluster, cb = nodes[e.b].cluster;
     m[ca][cb]++;

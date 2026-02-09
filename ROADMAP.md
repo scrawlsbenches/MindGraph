@@ -102,9 +102,9 @@ These are hygiene items that should be done before any feature work.
 | 3.1 | Replace `window` globals with event delegation | 1 session | Remove global namespace pollution |
 | 3.2 | Extract data computation from `tabs.js` HTML | 2 sessions | Testable analytics, reusable metrics |
 | 3.3 | ~~Add seeded PRNG for deterministic layouts~~ | ~~Done~~ | ~~Reproducible graphs (mulberry32, seed=42)~~ |
-| 3.4 | Extract physics constants to config | 30 min | Tunable simulation |
-| 3.5 | Decompose `renderer.js draw()` into passes | 1 session | Maintainable rendering |
-| 3.6 | Break circular dependency (interaction ↔ panels) | 1 session | Cleaner module graph |
+| 3.4 | ~~Extract physics constants to config~~ | ~~Done~~ | ~~16 named constants in PHYSICS object in config.js~~ |
+| 3.5 | ~~Decompose `renderer.js draw()` into passes~~ | ~~Done~~ | ~~6 focused rendering pass functions~~ |
+| 3.6 | ~~Break circular dependency (interaction ↔ panels)~~ | ~~Done~~ | ~~Extracted state-actions.js~~ |
 | 3.7 | Add simple event emitter for state changes | 1 session | Reactive UI updates |
 
 ### Phase 4: Feature Development
