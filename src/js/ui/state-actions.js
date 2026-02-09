@@ -9,10 +9,13 @@ import { updateND, updatePathBanner } from './panels.js';
 
 export function selectNode(n) {
   if (state.selectedNode === n) {
-    state.selectedNode = null; state.depthMap = null;
+    state.selectedNode = null;
+    state.depthMap = null;
   } else {
     state.selectedNode = n;
-    state.pathResult = null; state.pathStart = null; state.pathParticles = [];
+    state.pathResult = null;
+    state.pathStart = null;
+    state.pathParticles = [];
     updatePathBanner();
     state.selectionDepth = 1;
     updateDepthMap();
@@ -26,8 +29,8 @@ export function setDepth(d) {
   state.selectionDepth = d;
   updateDepthMap();
   state.labelVisCache = null;
-  document.querySelectorAll('.nd-depth-btn').forEach((/** @type {HTMLElement} */ b) =>
-    b.classList.toggle('active', +b.dataset.depth === d)
-  );
+  document
+    .querySelectorAll('.nd-depth-btn')
+    .forEach((/** @type {HTMLElement} */ b) => b.classList.toggle('active', +b.dataset.depth === d));
   updateND();
 }

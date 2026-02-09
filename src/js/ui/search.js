@@ -15,7 +15,7 @@ searchInput.oninput = () => {
   state.searchQuery = searchInput.value.trim().toLowerCase();
   searchClear.classList.toggle('visible', state.searchQuery.length > 0);
   searchBox.classList.toggle('active', state.searchQuery.length > 0);
-  nodes.forEach(n => n.matchesSearch = state.searchQuery ? n.word.includes(state.searchQuery) : true);
+  nodes.forEach((n) => (n.matchesSearch = state.searchQuery ? n.word.includes(state.searchQuery) : true));
   state.labelVisCache = null;
   updateStatus();
 };
@@ -25,7 +25,7 @@ searchClear.onclick = () => {
   state.searchQuery = '';
   searchClear.classList.remove('visible');
   searchBox.classList.remove('active');
-  nodes.forEach(n => n.matchesSearch = true);
+  nodes.forEach((n) => (n.matchesSearch = true));
   state.labelVisCache = null;
   updateStatus();
 };
@@ -43,17 +43,21 @@ CLUSTER_NAMES.forEach((name, ci) => {
 
 export function toggleCluster(ci) {
   state.activeCluster = state.activeCluster === ci ? -1 : ci;
-  filterPills.querySelectorAll('.filter-pill').forEach((/** @type {HTMLElement} */ p) =>
-    p.classList.toggle('dimmed', state.activeCluster !== -1 && +p.dataset.cluster !== state.activeCluster)
-  );
-  nodes.forEach(n => {
-    n.targetAlpha = (state.activeCluster === -1 || n.cluster === state.activeCluster) ? 1 : 0;
+  filterPills
+    .querySelectorAll('.filter-pill')
+    .forEach((/** @type {HTMLElement} */ p) =>
+      p.classList.toggle('dimmed', state.activeCluster !== -1 && +p.dataset.cluster !== state.activeCluster),
+    );
+  nodes.forEach((n) => {
+    n.targetAlpha = state.activeCluster === -1 || n.cluster === state.activeCluster ? 1 : 0;
   });
-  const h = nodes.filter(n => n.targetAlpha === 0).length;
+  const h = nodes.filter((n) => n.targetAlpha === 0).length;
   document.getElementById('hiddenLabel').textContent = h > 0 ? h + ' hidden' : '';
-  document.querySelectorAll('.topic-card').forEach((/** @type {HTMLElement} */ tc) =>
-    tc.classList.toggle('active', state.activeCluster === +tc.dataset.cluster)
-  );
+  document
+    .querySelectorAll('.topic-card')
+    .forEach((/** @type {HTMLElement} */ tc) =>
+      tc.classList.toggle('active', state.activeCluster === +tc.dataset.cluster),
+    );
   state.labelVisCache = null;
   updateStatus();
 }

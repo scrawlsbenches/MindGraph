@@ -69,7 +69,7 @@ All mutable state lives in a single exported object (`state.js`). Every module i
 
 ### 4.4 Data Generation
 
-Graph data is **hardcoded and deterministic** (modulo `Math.random()` calls at module load time). There is:
+Graph data is **hardcoded and deterministic** (seeded PRNG via mulberry32, seed=42). There is:
 - No data import/export
 - No persistence (graph resets on reload)
 - No external data source
@@ -140,17 +140,7 @@ The build is minimal and functional:
 
 ## 8. Git History
 
-The repository has 9 commits showing a clear evolution:
-1. Initial monolithic HTML commit (`infranodus-ui-5.html`)
-2. Reorganization into modular project structure
-3. Bug fix for script load order
-4. ES module conversion
-5. esbuild bundling added
-6. README added
-7. Self-contained dist/index.html
-8. Merge PR for file visibility
-
-The commit history is clean and logical, showing a deliberate refactoring from prototype to structured project.
+The repository has 30+ commits showing a clear evolution from an initial monolithic HTML prototype through modular reorganization, ES module conversion, esbuild bundling, and progressive addition of quality tooling (ESLint, Prettier, TypeScript checkJs, Vitest, Playwright). The commit history is clean and logical.
 
 ---
 

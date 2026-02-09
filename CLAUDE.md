@@ -16,7 +16,7 @@ Run `npm run preflight` at the beginning of every session, before doing any work
 2. Fetch remote branches
 3. Check for uncommitted changes
 4. Check for orphan branch work (branches with unmerged commits)
-5. Run the full check (`npm run check` — lint + typecheck + test + build)
+5. Run the full check (`npm run check` — format + lint + typecheck + test + build)
 6. Find the next incomplete roadmap item
 
 If the check fails, assess whether the failure is related to the current branch or pre-existing. Report the failure to the user and ask how they want to proceed — do not silently attempt large fixes.
@@ -75,7 +75,7 @@ npm run lint:fix     # ESLint with auto-fix
 npm run format       # Prettier (write)
 npm run format:check # Prettier (check only)
 npm run typecheck    # TypeScript checkJs (no emit)
-npm run check        # lint + typecheck + test + build (full CI check)
+npm run check        # format + lint + typecheck + test + build (full CI check)
 npm run test         # Vitest unit tests (35 tests)
 npm run test:watch   # Vitest watch mode
 npm run test:coverage # Vitest with coverage

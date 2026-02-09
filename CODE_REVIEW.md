@@ -233,7 +233,7 @@ Unit tests now exist for core pure functions (35 tests across 3 test files):
 - `tests/pathfinding.test.js` — 14 tests for `bfsPath` and `getNeighborsAtDepth`
 - `tests/tabs-helpers.test.js` — 11 tests for `wordSentiment`, `computeBridgeScore`, `computeDegrees`, `computeGraphDensity`, `computeClusteringCoeff`
 
-Remaining gaps: no integration tests, no visual regression tests, no E2E smoke tests.
+E2E smoke tests added (8 Playwright tests with screenshots). Remaining gaps: no integration tests, no visual regression tests.
 
 ### 5.2 ~~No Linting or Formatting~~ [RESOLVED]
 

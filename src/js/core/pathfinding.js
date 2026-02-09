@@ -12,7 +12,7 @@ export function bfsPath(startId, endId) {
   while (queue.length) {
     const path = queue.shift();
     const last = path[path.length - 1];
-    for (const nb of (adj.get(last) || [])) {
+    for (const nb of adj.get(last) || []) {
       if (!nodes[nb].visible) continue;
       if (nb === endId) return [...path, nb];
       if (!visited.has(nb)) {
@@ -32,7 +32,7 @@ export function getNeighborsAtDepth(nodeId, depth) {
   for (let d = 1; d <= depth; d++) {
     const next = new Set();
     for (const id of frontier) {
-      for (const nb of (adj.get(id) || [])) {
+      for (const nb of adj.get(id) || []) {
         if (!result.has(nb) && nodes[nb].visible) {
           result.set(nb, d);
           next.add(nb);
